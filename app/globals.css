@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-buttons: var(--buttons);
+  --color-textSecondary: var(--text-secondary);
+  --color-textPrimary: var(--text-primary);
+  --color-backgroundSecondary: var(--background-secondary);
+  --color-backgroundPrimary: var(--background-primary);
+  --color-backgroundThird: var(--background-third);
+  --color-borderColor: var(--border-color);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-text-default: var(--sidebar-text-default);
+
+}
+
+:root {
+  /* Backgrounds */
+  --background-primary: #F5F7FA;    /* Light grayish-blue */
+  --background-secondary: #FFFFFF;
+  --background-third: #FFFFFF 
+
+  /* Text */
+  --text-primary: #2B2D42;         /* Dark navy-blue (same as secondary bg) */
+  --text-secondary: #718EBF;       /* Very light grayish-blue */
+
+  /* Accents */
+  --buttons: #38A3A5;     
+  --border-color: #E6EFF5 ;       /* Medium gray */         
+  --sidebar: #FFFFFF;         
+  --sidebar-foreground: #E6EFF5;         
+  --sidebar-primary: #38A3A5;         
+  --sidebar-primary-foreground: #B1B1B1;         
+  --sidebar-accent: #B1B1B1;         
+  --sidebar-accent-foreground: #E6EFF5;         
+  --sidebar-border: hsl(220 13% 91%);         
+  --sidebar-ring: #38A3A5;
+  --sidebar-text-default: #B1B1B1;
+
+}
+
+.dark{
+  --background-primary: #121212;    /* Dark navy-blue */
+  --background-secondary: #1E1E1E; 
+  --background-third: #1E1E1E/* Very dark gray */
+
+  /* Text */
+  --text-primary: #F5F7FA;         /* Light grayish-blue (same as secondary bg) */
+  --text-secondary: #A8DADC;       /* Very light grayish-blue */
+
+  /* Accents */
+  --buttons: #38A3A5;              /* Teal */
+  --border-color: #B1B1B1;         /* Medium gray */        
+  --sidebar: hsl(240 5.9% 10%);       
+  --sidebar-foreground: hsl(240 4.8% 95.9%);         
+  --sidebar-primary: hsl(224.3 76.3% 48%);         
+  --sidebar-primary-foreground: hsl(0 0% 100%);         
+  --sidebar-accent: hsl(240 3.7% 15.9%);         
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);         
+  --sidebar-border: hsl(240 3.7% 15.9%);         
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+  body {
+    @apply bg-backgroundPrimary ;
+  }
+}
+

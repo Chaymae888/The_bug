@@ -1,0 +1,359 @@
+/* StickBug Container */
+.stickbug-container {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    & * {
+      position: absolute;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    
+  }
+  
+  /* StickBug Styles */
+  .stickbug {
+    --primaryColor: #38A3A5;
+    transform: scale(0.5);
+    width: 15vh;
+    height: 50vh;
+  }
+  
+  .head {
+    width: 4vmin;
+    height: 4.25vmin;
+    top: 14vmin;
+    left: 38.75vmin;
+    transform: rotate(90deg);
+    z-index: 2;
+  }
+
+.head:before {
+    width: 2.5vmin;
+    height: 2.15vmin;
+    border-radius: 100%;
+    top: 0.05vmin;
+    left: -0.3vmin;
+}
+
+
+.antenna {
+    width: 8vmin;
+    height: 8vmin;
+    top: -3vmin;
+    left: -7vmin;
+}
+
+.antenna:before, .antenna:after {
+    width: 10vmin;
+    height: 13vmin;
+    border: 10px solid var(--primaryColor);
+    border-radius: 5% ;
+    top: 12vmin;
+    transform: rotate(-4deg);
+    left: 2vmin;
+    clip-path: polygon(0 0, 100% 0, 100% 10%, 0 10%);
+    animation: palp1 0.75s 0s ease infinite;
+}
+
+ .antenna:after {
+    transform: rotate(-135deg);
+    top: 4.4vmin;
+    left: 3.6vmin;
+    transform-origin: 22% 6%;
+    animation: palp2 0.75s 0.33s ease infinite;
+}
+
+@keyframes palp1 {
+	  0% { transform: rotate(-45deg); }
+	 20% { transform: rotate(-45deg); }
+	 40% { transform: rotate(-44deg); }
+	 60% { transform: rotate(-45deg); }
+	 80% { transform: rotate(-44deg); }
+	100% { transform: rotate(-45deg); }
+}
+
+@keyframes palp2 {
+	  0% { transform: rotate(-135deg); }
+	 20% { transform: rotate(-135deg); }
+	 40% { transform: rotate(-134deg); }
+	 60% { transform: rotate(-135deg); }
+	 80% { transform: rotate(-134deg); }
+	100% { transform: rotate(-135deg); }
+}
+
+
+.body {
+    width: 40vmin;
+    height: 5vmin;
+    top: 32vmin;
+    transform: rotate(90deg);
+    left: 16.8vmin;
+	z-index: 1;
+    background: linear-gradient(0deg, var(--primaryColor) 0% , var(--primaryColor) 80%);
+    border-radius:17%  30% 30% 17%;
+}
+
+/*** LEGS ***/
+
+.legs {
+    width: 100%;
+    height: 100%;
+	z-index: 0;
+}
+
+.legs .top {
+    width: 55vmin;
+    height: 25vmin;
+    left: 4.5vmin;
+    top: 38vmin;
+}
+
+.legs .top .left {
+    width: 31vmin;
+    height: 15vmin;
+    left: 34vmin;
+}
+
+.legs .top .right {
+    width: 31vmin;
+    height: 15vmin;
+    left: 2vmin;
+    top: 4vmin;
+}
+
+.legs div span:nth-child(1) {
+    --base-angle: 80deg;
+    background: linear-gradient(90deg, var(--primaryColor) 0% , var(--primaryColor) 90%);
+    width: 0.75vmin;
+    height: 14vmin;
+    left: 3.75vmin;
+    transform: rotate(80deg);
+    top: 2vmin;	
+    transform-origin: left center;
+    animation: left-leg-walk 1s infinite ease-in-out 0.3s;
+}
+
+.legs div .left span:nth-child(1):before {
+    display: none;
+}
+
+.legs div span:nth-child(2) {
+    --base-angle: -38deg;
+    background: linear-gradient(-90deg, var(--primaryColor) 0% , var(--primaryColor) 90%);
+    width: 0.67vmin;
+    height: 12vmin;
+    left: 13.5vmin;
+    transform: rotate(-38deg);
+    top: 7vmin;
+    border-radius: 0% 50% 100% 100%;
+    animation: left-2-leg-segment-movement 1s infinite ease-in-out 0.3s;
+    transform-origin: left center;
+}
+
+
+
+.legs div div span {
+	border-radius: 15%;
+}
+
+.legs div .right span:nth-child(1) {
+    --base-angle: -80deg;
+    height: 12vmin;
+    left: 23vmin;
+    transform: rotate(-80deg);
+    top: -0.6vmin;
+    animation: right-leg-walk 1s infinite ease-in-out 0.3s;
+	
+	
+}
+
+
+.legs div .right span:nth-child(2) {
+    --base-angle: 38deg;
+    width: 0.75vmin;
+    height: 12vmin;
+    left: 13.65vmin;
+    transform: rotate(38deg);
+    top: 2.3vmin;
+    animation: right-2-leg-segment-movement 1s infinite ease-in-out 0.3s;
+}
+
+
+
+
+/*** LEGS MID ***/
+
+.legs .mid {
+    width: 55vmin;
+    height: 25vmin;
+    left: 8vmin;
+    top: 34vmin;
+}
+
+.legs .mid .left {
+    width: 31vmin;
+    height: 15vmin;
+}
+
+.legs .mid span:nth-child(1) {
+    --base-angle: 80deg;
+    width: 0.75vmin;
+    height: 14vmin;
+    left: 20.5vmin;
+    transform: rotate(80deg);
+    top: -5vmin;
+    animation: right-leg-walk 1s infinite ease-in-out 0.3s;
+}
+
+.legs .mid span:nth-child(2) {
+    left: 10.05vmin;
+    --base-angle: 38deg;
+    transform: rotate(38deg);
+    top: 2vmin;
+    height: 12vmin;
+    animation:right-2-leg-segment-movement  1s infinite ease-in-out 0.3s;
+}
+
+
+.legs .mid .right {
+    width: 25vmin;
+    height: 25vmin;
+    left: 29vmin;
+}
+
+.legs .mid .right span:nth-child(1) {
+    --base-angle: -80deg;
+    transform: rotate(-80deg);
+    height: 12vmin;
+    top: -3.4vmin;
+    left: 7vmin;
+    animation: left-leg-walk 1s infinite ease-in-out 0.3s;
+}
+
+.legs .mid .right span:nth-child(1):before {
+    display: none;
+}
+
+.legs .mid .right span:nth-child(2) {
+    --base-angle: -38deg;
+    transform: rotate(-38deg);
+    height: 13vmin;
+    top: 1.8vmin;
+    left: 16.4vmin;
+    background: linear-gradient(90deg, var(--primaryColor) 0% , var(--primaryColor) 90%);
+    animation: left-2-leg-segment-movement 1s infinite ease-in-out 0.3s;
+}
+
+
+
+
+
+
+/*** LEGS BOT ***/
+
+.legs .bot {
+    width: 48vmin;
+    height: 15vmin;
+    left: 20vmin;
+    top: 15vmin;
+}
+
+.legs .bot .left {
+    width: 20vmin;
+    height: 12vmin;
+    top: 3vmin;
+    left: 14vmin;
+}
+
+
+.legs .bot span:nth-child(1) {
+    --base-angle: -106deg;
+    width: 0.75vmin;
+    height: 14vmin;
+    left: 9.95vmin;
+    transform: rotate(-106deg);
+    background: linear-gradient(90deg, var(--primaryColor) 0% , var(--primaryColor) 90%);
+    top: -1.75vmin;
+}
+
+.legs .bot span:nth-child(1):before {
+    display: none;
+}
+
+.legs .bot span:nth-child(2) {
+    --base-angle: -54deg;
+    left: 20vmin;
+    transform: rotate(-54deg);
+    top: 1.15vmin;
+    height: 10.25vmin;
+    background: linear-gradient(90deg, var(--primaryColor) 0% , var(--primaryColor) 90%);
+}
+
+
+.legs .bot .right {
+    width: 18vmin;
+    height: 12vmin;
+    top: 2.4vmin;
+    left: 0.5vmin;
+}
+
+.legs .bot .right span:nth-child(1) {
+    --base-angle: 106deg;
+    left: 9.15vmin;
+    transform: rotate(106deg);
+    height: 12vmin;
+    top: -0.9vmin;
+}
+
+
+.legs .bot .right span:nth-child(2) {
+    --base-angle: 54deg;
+    left: -1.15vmin;
+    transform: rotate(54deg);
+    top: 1.15vmin;
+    height: 12vmin;
+}
+
+
+
+/* Animation of the legs  */
+@keyframes left-leg-walk {
+    0%, 100% { transform: rotate(calc(var(--base-angle) + 10deg)); }
+    50% { transform: rotate(calc(var(--base-angle) - 10deg)); }
+}
+
+@keyframes right-leg-walk {
+    0%, 100% { transform: rotate(calc(var(--base-angle) - 10deg)); }
+    50% { transform: rotate(calc(var(--base-angle) + 10deg)); }
+}
+
+@keyframes left-2-leg-segment-movement {
+    0%, 100% {
+      transform: 
+        rotate(var(--base-angle)) /* Original rotation */
+        translateY(5px) translateX(-5px); /* New translation */
+    }
+    50% {
+      transform:
+        rotate(var(--base-angle)) 
+        translateY(-5px) translateX(5px);
+    }
+  }
+  @keyframes right-2-leg-segment-movement {
+    0%, 100% {
+      transform: 
+        rotate(var(--base-angle)) /* Original rotation */
+        translateY(5px) translateX(5px); /* New translation */
+    }
+    50% {
+      transform:
+        rotate(var(--base-angle)) 
+        translateY(-5px) translateX(-5px);
+    }
+  }
+
