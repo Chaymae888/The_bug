@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Tag, Newspaper,Home, MessageCircle, Users,Settings } from "lucide-react"
 import Image from 'next/image';
 import Logo from '@/public/icons/stickbug-icon.png';
 
@@ -27,22 +27,22 @@ const items = [
   {
     title: "Tags",
     url: "/tags",
-    icon: Inbox,
+    icon: Tag,
   },
   {
-    title: "Discussions",
+    title: "Posts",
     url: "/discussions",
-    icon: Calendar,
+    icon: Newspaper,
   },
   {
     title: "Chats",
     url: "/chats",
-    icon: Search,
+    icon: MessageCircle,
   },
   {
     title: "Users",
     url: "/users",
-    icon: Settings,
+    icon: Users,
   },
   {
     title: "Settings",
