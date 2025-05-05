@@ -21,34 +21,34 @@ import { usePathname } from "next/navigation";
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/home",
     icon: Home,
   },
   {
     title: "Tags",
-    url: "/tags",
+    url: "/home/TagList",
     icon: Tag,
   },
-  {
-    title: "Posts",
-    url: "/discussions",
-    icon: Newspaper,
-  },
+  // {
+  //   title: "Posts",
+  //   url: "/discussions",
+  //   icon: Newspaper,
+  // },
   {
     title: "Chats",
-    url: "/chats",
+    url: "/home/room-list",
     icon: MessageCircle,
   },
   {
     title: "Users",
-    url: "/users",
+    url: "/home/user-list",
     icon: Users,
   },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
+  // {
+  //   title: "Settings",
+  //   url: "/settings",
+  //   icon: Settings,
+  // },
 ]
 
 export function AppSidebar() {

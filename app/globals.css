@@ -29,7 +29,6 @@
   /* Backgrounds */
   --background-primary: #F5F7FA;    /* Light grayish-blue */
   --background-secondary: #FFFFFF;
-  --background-third: #FFFFFF;
   --background-tag: #EDF1F7;
 
   /* Text */
@@ -56,7 +55,7 @@
 .dark{
   --background-primary: #121212;    /* Dark navy-blue */
   --background-secondary: #1E1E1E; 
-  --background-third: #1E1E1E/* Very dark gray */
+  --background-third: #1E1E1E;/* Very dark gray */
   
 
   /* Text */
