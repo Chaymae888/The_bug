@@ -13,7 +13,7 @@ const TagList = () => {
         { name: 'html', count: 1347456, description: 'HTML (HyperText Markup Language) is the markup language for creating web pages' },
       ]
   return (
-    <div className='p-4 flex flex-col'>https://ujogos.com/?gad_source=5&gclid=EAIaIQobChMI-Kmi5_WAjQMV3kkdCR3TgR0HEAEYASAAEgLhSvD_BwE
+    <div className='p-4 flex flex-col'>
         <h1 className='text-[50px] text-textPrimary'>Tags</h1>
         <h1 className='py-6 w-2/3 text-textPrimary'>A tag is a keyword or label that categorizes your question with other, similar questions. Using the right tags makes it easier for others to find and answer your question.</h1>
         <div className='flex justify-between items-center'>

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Image from 'next/image';
-import Logo from '@/public/icons/stickbug-icon.png';
+import Logo from '@/public/assets/icons/stickbug-icon.png';
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
@@ -364,6 +364,7 @@ const sidebarLogoVariants = cva(
   }
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function SidebarHeader({ className, children, ...props }: React.ComponentProps<"div">) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";

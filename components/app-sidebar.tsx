@@ -1,8 +1,8 @@
 "use client";
 
 import { Tag, Newspaper,Home, MessageCircle, Users,Settings } from "lucide-react"
-import Image from 'next/image';
-import Logo from '@/public/icons/stickbug-icon.png';
+import Image from "next/image";
+import Logo from '@/public/assets/icons/stickbug-icon.png';
 
 import {
   Sidebar,
