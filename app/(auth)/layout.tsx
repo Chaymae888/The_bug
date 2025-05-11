@@ -3,8 +3,8 @@
 import StickBug from '@/components/StickBug'
 import styles from '@/components/StickBug.module.css'
 import Image from 'next/image'
-import logo_light from '@/public/images/bug-logo-light.png'
-import logo_dark from '@/public/images/bug-logo-dark.png'
+import logo_light from '@/public/assets/images/bug-logo-light.png'
+import logo_dark from '@/public/assets/images/bug-logo-dark.png'
 import { useTheme } from '@/context/ThemeContext'
 import { Moon, Sun } from 'lucide-react'
 

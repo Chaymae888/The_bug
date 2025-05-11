@@ -1,6 +1,7 @@
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
+import { useDebouncedCallback } from 'use-debounce';
 import {
   $createParagraphNode,
   $isRootOrShadowRoot,
@@ -120,6 +121,7 @@ export default function ToolbarPlugin() {
       }
     });
   }, [editor]);
+
   const toggleList = useCallback((listType: 'number' | 'bullet') => {
     editor.update(() => {
       const selection = $getSelection();
@@ -148,12 +150,18 @@ export default function ToolbarPlugin() {
     });
   }, [editor]);
 
+  const handleSave= useDebouncedCallback((content) => {console.log(content)}, 500);
+
   useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
+      editor.registerUpdateListener(({ editorState, dirtyElements,dirtyLeaves }) => {
         editorState.read(() => {
           $updateToolbar();
         });
+        if(dirtyElements.size===0 && dirtyLeaves.size===0) {
+          return;
+        }
+        handleSave(JSON.stringify(editorState));
       }),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,

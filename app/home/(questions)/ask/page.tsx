@@ -3,9 +3,29 @@ import  {Editor}  from '@/components/editor/Editor'
 import ToolbarPlugin from '@/components/editor/plugins/ToolbarPlugin'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import React from 'react'
+import React, { useState } from 'react'
+import {SelectScrollable} from '@/components/SelectScrollable'
+import { useRouter } from 'next/navigation'
+import { nanoid } from 'nanoid'
 
-const Ask = () => {
+
+export default function Ask() {
+  const router = useRouter();
+  const [title, setTitle] = useState('');
+  const [editorContent, setEditorContent] = useState('')
+
+  
+  const handleSubmit = () => {
+    const formData = {
+      title,
+      content: editorContent,
+    }
+    const id = nanoid()
+    sessionStorage.setItem(`question-${id}`, JSON.stringify(formData))
+    
+    router.push(id)
+
+  }
   return (
     <div className='p-4 flex flex-col'>
         <h1 className='text-[50px] text-textPrimary'>Ask a public question</h1>
@@ -24,22 +44,20 @@ const Ask = () => {
         <div>
         <h1 className='font-bold pt-8'>Title</h1>
         <h3 className='pt-4 pb-1' >Be specific and imagine you’re asking a question to another person.</h3>
-        <Input type='text' placeholder='e.g. Is there an R function for finding the index of an element in a vector?' className='border border-borderColor  bg-backgroundSecondary rounded-[10px] w-1/2 focus:ring-0 focus:border-borderColor' />
+        <Input type='text' value={title} onChange={(e)=>setTitle(e.target.value)} placeholder='e.g. Is there an R function for finding the index of an element in a vector?' className='border border-borderColor  bg-backgroundSecondary rounded-[10px] w-1/2 ' />
         </div>
         <div>
         <h1 className='font-bold pt-8'>What are the details of your problem?</h1>
         <h3 className='pt-4 pb-1' >Include all the information someone would need to answer your question</h3>
-        <Editor/>
+        <Editor onSave={setEditorContent}/>
         </div>
         <div className='py-8'>
         <h1 className='font-bold '>Tags</h1>
         <h3 className='pt-4 pb-1' >Add up to 5 tags to describe what your question is about</h3>
-        <Input type='text' placeholder='e.g. (r jquery objective-c)' className='border border-borderColor  bg-backgroundSecondary rounded-[10px] w-1/2' />
+        <SelectScrollable/>
         </div>
 
-        <Button className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post your question</Button>
+        <Button onClick={handleSubmit} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post your question</Button>
         </div>
   )
 }
-
-export default Ask

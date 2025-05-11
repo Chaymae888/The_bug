@@ -17,6 +17,10 @@ let registered = false;
 
 export function registerImageNode(editorConfig: any) {
   if (!registered) {
+    // Make sure to properly initialize the node
+    if (!editorConfig.nodes) {
+      editorConfig.nodes = [];
+    }
     editorConfig.nodes.push(ImageNode);
     registered = true;
   }
@@ -58,9 +62,12 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         this.__height = height;
       }
 
+
     static getType(): string {
         return 'image';
     }
+
+    
 
     static clone(node: ImageNode): ImageNode {
         return new ImageNode(
@@ -73,16 +80,40 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         );
       }
 
+      static importJSON(serializedNode: SerializedImageNode): ImageNode {
+        // Always create a fresh node instance
+        return $createImageNode(
+            serializedNode.src,
+            serializedNode.altText,
+            serializedNode.maxWidth ?? 400, // Provide defaults
+            serializedNode.width ?? 'inherit',
+            serializedNode.height ?? 'inherit'
+        );
+    }
+
+    exportJSON(): SerializedImageNode {
+        return {
+            ...super.exportJSON(),
+            src: this.__src,
+            altText: this.__altText,
+            maxWidth: this.__maxWidth,
+            width: this.__width,
+            height: this.__height,
+            type: 'image',
+            version: 1
+        };
+    }
     decorate(): JSX.Element {
         return(
             <img
                 src={this.__src}
                 alt={this.__altText}
                 style={{
-                    maxWidth: this.__maxWidth,
-                    width: this.__width,
-                    height: this.__height,
+                    maxWidth: `${this.__maxWidth}px`,
+                    width: this.__width === 'inherit' ? 'inherit' : `${this.__width}px`,
+                    height: this.__height === 'inherit' ? 'inherit' : `${this.__height}px`,
                 }}
+                key={this.__key}
             />
         );
     }
@@ -126,6 +157,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
             element: image,
         };
     }
+    
 
     static importDOM(): DOMConversionMap | null {
         return {
@@ -135,4 +167,14 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         };
     }
 
+}
+interface SerializedImageNode {
+    src: string;
+    altText: string;
+    maxWidth: number;
+    width: 'inherit' | number;
+    height: 'inherit' | number;
+    type: 'image';
+    version: 1;
+    key?: string;
 }
