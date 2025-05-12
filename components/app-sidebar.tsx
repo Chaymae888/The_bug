@@ -26,7 +26,7 @@ const items = [
   },
   {
     title: "Tags",
-    url: "/home/TagList",
+    url: "/tags",
     icon: Tag,
   },
   // {
@@ -36,12 +36,12 @@ const items = [
   // },
   {
     title: "Chats",
-    url: "/home/room-list",
+    url: "/chats",
     icon: MessageCircle,
   },
   {
     title: "Users",
-    url: "/home/user-list",
+    url: "/users",
     icon: Users,
   },
   // {

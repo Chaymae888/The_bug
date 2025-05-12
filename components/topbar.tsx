@@ -11,7 +11,7 @@ const Topbar = () => {
   const { theme, toggleTheme } = useTheme()
   return (
     <div className='relative bg-backgroundSecondary w-full top-0 left-0 h-16 border border-borderColor flex items-center justify-between px-4 '>
-      <SearchInput placeholder='Search for a question'/>
+      <SearchInput placeholder='Search for a question' />
       <div className='flex items-center gap-2'>
         <button
           onClick={toggleTheme}
@@ -21,9 +21,11 @@ const Topbar = () => {
           {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
         </button>
         <Link href="/login" passHref>
-        <Button type='submit' className='bg-backgroundSecondary text-buttons border border-buttons rounded-full hover:bg-buttonsHover'>Login</Button>
+          <Button type='submit' className='bg-backgroundSecondary text-buttons border border-buttons rounded-full hover:bg-buttonsHover'>Login</Button>
         </Link>
-        <Button type='submit' className='bg-buttons text-white rounded-full hover:bg-buttonsHover'>Sign-in</Button>
+        <Link href="/signup" passHref>
+          <Button type='submit' className='bg-buttons text-white rounded-full hover:bg-buttonsHover'>Sign-in</Button>
+        </Link>
       </div>
     </div>
   )

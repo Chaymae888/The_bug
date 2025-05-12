@@ -14,18 +14,25 @@ interface Tag {
   value: string
   label: string
 }
+interface SelectScrollableProps {
+  onSelectedItemsChange?: (items: string[]) => void;
+}
 
-export function SelectScrollable() {
+export function SelectScrollable({ onSelectedItemsChange }: SelectScrollableProps) {
   const [selectedItems, setSelectedItems] = React.useState<string[]>([])
 
   const handleSelect = (value: string) => {
     if (!selectedItems.includes(value)) {
-      setSelectedItems([...selectedItems, value])
+      const newItems = [...selectedItems, value];
+      setSelectedItems(newItems);
+      onSelectedItemsChange?.(newItems);
     }
   }
 
   const removeItem = (value: string) => {
-    setSelectedItems(selectedItems.filter(item => item !== value))
+    const newItems = selectedItems.filter(item => item !== value);
+    setSelectedItems(newItems);
+    onSelectedItemsChange?.(newItems);
   }
 
   const tags: Tag[] = [

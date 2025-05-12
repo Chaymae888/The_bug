@@ -13,12 +13,13 @@ export default function Ask() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [editorContent, setEditorContent] = useState('')
-
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   const handleSubmit = () => {
     const formData = {
       title,
       content: editorContent,
+      tags: selectedTags,
     }
     const id = nanoid()
     sessionStorage.setItem(`question-${id}`, JSON.stringify(formData))
@@ -54,7 +55,7 @@ export default function Ask() {
         <div className='py-8'>
         <h1 className='font-bold '>Tags</h1>
         <h3 className='pt-4 pb-1' >Add up to 5 tags to describe what your question is about</h3>
-        <SelectScrollable/>
+        <SelectScrollable onSelectedItemsChange={setSelectedTags}/>
         </div>
 
         <Button onClick={handleSubmit} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post your question</Button>
