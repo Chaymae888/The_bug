@@ -4,7 +4,7 @@ import ToolbarPlugin from '@/components/editor/plugins/ToolbarPlugin'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
-import {SelectScrollable} from '@/components/SelectScrollable'
+import {SelectTags} from '@/components/SelectTags'
 import { useRouter } from 'next/navigation'
 import { nanoid } from 'nanoid'
 
@@ -55,7 +55,7 @@ export default function Ask() {
         <div className='py-8'>
         <h1 className='font-bold '>Tags</h1>
         <h3 className='pt-4 pb-1' >Add up to 5 tags to describe what your question is about</h3>
-        <SelectScrollable onSelectedItemsChange={setSelectedTags}/>
+        <SelectTags onSelectedItemsChange={setSelectedTags}/>
         </div>
 
         <Button onClick={handleSubmit} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post your question</Button>

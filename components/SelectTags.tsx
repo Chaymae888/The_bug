@@ -14,11 +14,11 @@ interface Tag {
   value: string
   label: string
 }
-interface SelectScrollableProps {
+interface SelectTagsProps {
   onSelectedItemsChange?: (items: string[]) => void;
 }
 
-export function SelectScrollable({ onSelectedItemsChange }: SelectScrollableProps) {
+export function SelectTags({ onSelectedItemsChange }: SelectTagsProps) {
   const [selectedItems, setSelectedItems] = React.useState<string[]>([])
 
   const handleSelect = (value: string) => {

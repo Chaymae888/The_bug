@@ -7,11 +7,29 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, EyeOff, Github, Mail } from 'lucide-react'
+import { useAuthStore } from '@/lib/stores/useAuthStore'
+import { useRouter } from 'next/navigation'
 
 export default function Signup() {
+  const [username ,setUsername] =useState('')
   const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const {signup}=useAuthStore() 
+  const router = useRouter()
+
+  const handleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log('Signup attempt started');
+  
+  try {
+    await signup({ username, email, password });
+    router.push('/emailconfirmation');
+  } catch (error) {
+    console.error('Registration error:', error instanceof Error ? error.message : 'Signup failed');
+    // Set error state here if needed
+  }
+};
   
     return (
       <motion.div
@@ -27,7 +45,11 @@ export default function Signup() {
           </p>
         </div>
   
-        <form className='space-y-4 p-5'>
+        <form className='space-y-4 p-5' onSubmit={handleSignup}>
+          <div className='space-y-2'>
+            <Label htmlFor='username' className='text-sm text-textPrimary font-semibold'>Username</Label>
+            <Input type='username' id='username' placeholder='Enter your usrname' value={username} required onChange={(e) => setUsername(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
+          </div>
           <div className='space-y-2'>
             <Label htmlFor='email' className='text-sm text-textPrimary font-semibold'>Email</Label>
             <Input type='email' id='email' placeholder='Enter your email' value={email} required onChange={(e) => setEmail(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />

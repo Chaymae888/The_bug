@@ -7,13 +7,31 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, EyeOff, Github, Mail } from 'lucide-react'
+import { useAuthStore } from '@/lib/stores/useAuthStore'
+import {useRouter} from 'next/navigation'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
+  const router = useRouter()
+  const { login} = useAuthStore()
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await login({ email, password })
+      console.log('Login successful')
+      router.push('/home') 
+    } catch (error) {
+      console.log(error instanceof Error ? error.message : 'Login failed')
+  }
+  }
+
+  const handleOAuthLogin = (provider: 'github' | 'google') => {
+    window.location.href = `oauth2/authorization/${provider}`
+  }
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -56,7 +74,7 @@ export default function LoginPage() {
           </div>
           <a href='#' className='text-sm text-textSecondary font-medium hover:text-buttons'>Forgot password?</a>
         </div>
-        <Button type='submit' className='w-full bg-buttons text-white rounded-full hover:bg-buttonsHover'>Login</Button>
+        <Button  onClick={handleLogin} type='submit' className='w-full bg-buttons text-white rounded-full hover:bg-buttonsHover'>Login</Button>
 
       </form>
 
@@ -75,6 +93,7 @@ export default function LoginPage() {
         <Button
           variant="outline"
           className="w-full bg-backgroundPrimary text-textSecondary rounded-full hover:bg-buttons hover:text-white"
+          onClick={() => handleOAuthLogin('github')}
         >
           <Github className="mr-2" />
           Github
@@ -82,6 +101,7 @@ export default function LoginPage() {
         <Button
           variant="outline"
           className="w-full bg-backgroundPrimary text-textSecondary rounded-full hover:bg-buttons hover:text-white"
+          onClick={()=>handleOAuthLogin('google')}
         >
           <Mail className="mr-2" />
           Google
