@@ -6,25 +6,197 @@ import { Cake, Clock } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { User } from '@/types/user'
+import { Separator } from '@/components/ui/separator'
 
 export default function UserPage() {
     const [activeTab, setActiveTab] = useState<'profile' | 'activity'>('profile')
-    const [activity, setActivity] = useState<'answers' | 'questions' | 'Users' | 'reputation'>('questions')
-    const [following, setFollowing] = useState<'questions' | 'users' | 'Users'>('questions')
+    const [activity, setActivity] = useState<'answers' | 'questions' | 'tags' | 'reputation'>('questions')
     const [user, setUser] = useState<User | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
     const [isFollowing, setIsFollowing] = useState(false)
     const params = useParams();
+
+    const questions = [
+    {
+      id: 1,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Doe',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 1000,
+      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
+      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 2,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Sina',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 900,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 3,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Whick',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 500,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    }
+  ]
+   const answers = [
+    {
+      id: 1,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Doe',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 1000,
+      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
+      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 2,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Sina',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 900,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 3,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Whick',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 500,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    }
+  ]
+   const tags = [
+    {
+      id: 1,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Doe',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 1000,
+      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
+      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 2,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Sina',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 900,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 3,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Whick',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 500,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    }
+  ]
+   const reputation = [
+    {
+      id: 1,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Doe',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 1000,
+      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
+      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 2,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Sina',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 900,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    },
+    {
+      id: 3,
+      userImage: 'https://github.com/shadCN.png',
+      username: 'John Whick',
+      userJob: 'Software Engineer',
+      userContributionsNumber: 500,
+      title: 'How to use React?',
+      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
+      numberofresponses: 5,
+      numberofupvotes: 10,
+      numberofdownvotes: 2,
+      tags: ['react', 'javascript'],
+    }
+  ]
+
+  const activityData = {
+        questions: questions,
+        answers: answers,
+        tags: tags,
+        reputation: reputation
+    }
+
+    // Get the current data based on selected activity
+    const currentActivityData = activityData[activity]
+
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                // Check sessionStorage first
                 const storedUser = sessionStorage.getItem('current-user')
                 if (storedUser) {
                     setUser(JSON.parse(storedUser))
-                    setLoading(false)
                     return
                 }
 
@@ -42,14 +214,31 @@ export default function UserPage() {
 
                 // Fallback to API fetch if needed
                 const response = await fetch(`/api/users/${encodeURIComponent(originalName)}`)
-                if (!response.ok) throw new Error('User not found')
+                if (!response.ok) {
+                    setUser({
+                        username: username,
+                        image: '',
+                        job: 'Data Scientist',
+                        country: 'India',
+                        numberoffollowers: 400,
+                        goodAt: ['python', 'pandas', 'machine learning'],
+                        numberofVotes: 40,
+                        numberofEdits: 20,
+                        memberfor: '1 year',
+                        lastseen: '6 hours ago',
+                        reputation: 1000,
+                        about: 'Quality matters.',
+                        links: [],
+                        answers: 0,
+                        questions: 0
+                    })
+                }
 
-                const data = await response.json()
-                setUser(data)
+                // const data = await response.json()
+                // setUser(data)
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load user')
-            } finally {
-                setLoading(false)
+                console.error('Error fetching user data:', err)
+                setUser(null) // Set user to null if there's an error
             }
         }
 
@@ -84,8 +273,8 @@ export default function UserPage() {
                         </div>
                     </div>
                     <div className='flex justify-center sm:justify-end'>
-                        <Button variant="outline" className='cursor-pointer bg-buttons text-backgroundPrimary rounded-[10px]' onClick={()=>setIsFollowing(!isFollowing)}>
-                            {isFollowing?'Following':'Follow'}
+                        <Button variant="outline" className='cursor-pointer bg-buttons text-backgroundPrimary rounded-[10px]' onClick={() => setIsFollowing(!isFollowing)}>
+                            {isFollowing ? 'Following' : 'Follow'}
                         </Button>
                     </div>
                 </div>
@@ -151,12 +340,21 @@ export default function UserPage() {
                     <div >
                         <h1 className='text-sm mb-1 text-[#B1B1B1]'>View all activity pages</h1>
                         <SelectItem
-                            items={['questions', 'answers', 'Users', 'reputation']}
+                            items={['questions', 'answers', 'tags', 'reputation']}
                             item={activity}
                             setItem={setActivity} />
 
                         <div className='mt-4 bg-backgroundSecondary border border-borderColor rounded-[10px] p-4'>
-                            <p className='text-center text-textSecondary'>You don't have any {activity} yet</p>
+                            {currentActivityData.map((item, index) => (
+                                <React.Fragment key={item.id}>
+                                  {index > 0 && <Separator className="bg-blue-50" />}
+                                  <div className='flex  px-4 py-2 items-center gap-2'>
+                                    <h1 className='font-medium px-4 py-2 border rounded-[10px] text-backgroundSecondary bg-buttons text-center '>{item.numberofresponses}</h1>
+                                    <h1 className='font-medium text-sm  text-textSecondary hover:text-buttons underline line-clamp-2 cursor-pointer '>{item.title}</h1>
+                                  </div>
+                    
+                                </React.Fragment>
+                              ))}
                         </div>
                     </div>
                 )}

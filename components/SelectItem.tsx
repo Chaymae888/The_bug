@@ -4,7 +4,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem as SelectItemOption,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"

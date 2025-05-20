@@ -1,7 +1,6 @@
 'use client'
 import SearchInput from '@/components/search-input'
 import { AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@radix-ui/react-avatar'
 import React from 'react'
 import { useRouter } from 'next/navigation'

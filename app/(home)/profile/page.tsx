@@ -2,13 +2,15 @@
 import SelectItem from '@/components/SelectItem'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Cake, Clock } from 'lucide-react'
+import { Cake, Clock} from 'lucide-react'
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Profile() {
     const [activeTab, setActiveTab] = useState<'profile' | 'activity' | 'followings'>('profile')
     const [activity, setActivity] = useState<'answers' | 'questions' | 'tags' | 'reputation'>('questions')
     const [following,setFollowing] = useState<'questions' | 'users' | 'tags'>('questions')
+    const router = useRouter()
 
     return (
         <div className='flex flex-col p-4'>
@@ -36,7 +38,7 @@ export default function Profile() {
                     </div>
                 </div>
                 <div className='flex justify-center sm:justify-end'>
-                    <Button variant="outline" className='cursor-pointer bg-buttons text-backgroundPrimary rounded-[10px]'>
+                    <Button  onClick={()=>router.push('/profile/edit')} variant="outline" className='cursor-pointer bg-buttons text-backgroundPrimary rounded-[10px]'>
                         Edit profile
                     </Button>
                 </div>
@@ -99,7 +101,9 @@ export default function Profile() {
                 <div className='flex flex-col w-full'>
                     <h1 className='text-xl'>About</h1>
                     <div className='bg-backgroundSecondary border border-borderColor rounded-[10px] p-4 sm:px-36 sm:py-6 w-full'>
-                        <h1 className='text-center'>Your about me section is currently blank. Would you like to add one? Edit profile</h1>
+                        <h1 className='text-center'>Your about me section is currently blank. Would you like to add one?
+                            <span onClick={()=>router.push('/profile/edit')} className='underline text-buttons cursor-pointer'>Edit profile</span>
+                        </h1>
                     </div>
                 </div>
             </div>
@@ -113,7 +117,7 @@ export default function Profile() {
               setItem={setActivity}/>
 
             <div className='mt-4 bg-backgroundSecondary border border-borderColor rounded-[10px] p-4'>
-                <p className='text-center text-textSecondary'>You don't have any {activity} yet</p>
+                <p className='text-center text-textSecondary'>You don&#39;t have any {activity} yet</p>
             </div>
           </div>
         )}
@@ -127,7 +131,7 @@ export default function Profile() {
               setItem={setFollowing}/>
 
             <div className='mt-4 bg-backgroundSecondary border border-borderColor rounded-[10px] p-4'>
-                <p className='text-center text-textSecondary'>You haven't followed any {following} yet</p>
+                <p className='text-center text-textSecondary'>You haven&#39;t followed any {following} yet</p>
             </div>
           </div>
         )}

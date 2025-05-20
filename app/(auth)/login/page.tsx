@@ -1,37 +1,19 @@
 'use client'
-
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, EyeOff, Github, Mail } from 'lucide-react'
-import { useAuthStore } from '@/lib/stores/useAuthStore'
-import {useRouter} from 'next/navigation'
+
+import useLogin from '@/hooks/use-login'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [remember, setRemember] = useState(false)
-  const router = useRouter()
-  const { login} = useAuthStore()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      await login({ email, password })
-      console.log('Login successful')
-      router.push('/home') 
-    } catch (error) {
-      console.log(error instanceof Error ? error.message : 'Login failed')
-  }
-  }
+  const { register,handleSubmit , errors , showPassword, setShowPassword,remember, setRemember,  handleOAuthLogin } = useLogin()
 
-  const handleOAuthLogin = (provider: 'github' | 'google') => {
-    window.location.href = `oauth2/authorization/${provider}`
-  }
+
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -46,18 +28,24 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form className='space-y-4 p-5'>
+      <form onSubmit={handleSubmit} className='space-y-4 p-5'>
         <div className='space-y-2'>
           <Label htmlFor='email' className='text-sm text-textPrimary font-semibold'>Email</Label>
-          <Input type='email' id='email' placeholder='Enter your email' value={email} required onChange={(e) => setEmail(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
+          <Input type='email' id='email' placeholder='Enter your email' className='border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary' {...register('email')} />
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+          )}
         </div>
         <div className='space-y-2'>
           <Label htmlFor='password' className='text-sm text-textPrimary font-semibold'>Password</Label>
           <div className='relative'>
-            <Input type={showPassword ? 'text' : 'password'} id='password' placeholder='Enter your password' value={password} required onChange={(e) => setPassword(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
+            <Input type={showPassword ? 'text' : 'password'} id='password' placeholder='Enter your password' {...register('password')} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
             <button type='button' onClick={() => setShowPassword(!showPassword)} className='absolute right-3 top-1/2 transform -translate-y-1/2'>
               {showPassword ? <EyeOff className='text-textSecondary' /> : <Eye className='text-textSecondary' />}
             </button>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+            )}
           </div>
         </div>
         <div className='flex items-center justify-between'>
@@ -74,7 +62,7 @@ export default function LoginPage() {
           </div>
           <a href='#' className='text-sm text-textSecondary font-medium hover:text-buttons'>Forgot password?</a>
         </div>
-        <Button  onClick={handleLogin} type='submit' className='w-full bg-buttons text-white rounded-full hover:bg-buttonsHover'>Login</Button>
+        <Button  type='submit' className='w-full bg-buttons text-white rounded-full hover:bg-buttonsHover'>Login</Button>
 
       </form>
 
@@ -101,7 +89,7 @@ export default function LoginPage() {
         <Button
           variant="outline"
           className="w-full bg-backgroundPrimary text-textSecondary rounded-full hover:bg-buttons hover:text-white"
-          onClick={()=>handleOAuthLogin('google')}
+          onClick={() => handleOAuthLogin('google')}
         >
           <Mail className="mr-2" />
           Google

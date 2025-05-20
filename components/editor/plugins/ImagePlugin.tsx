@@ -16,7 +16,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $createImageNode } from '@/nodes/ImageNode';
+import { $createImageNode } from '@/components/editor/nodes/ImageNode';
 import { $getRoot, $insertNodes } from 'lexical';
 
 export default function ImagePlugin() {

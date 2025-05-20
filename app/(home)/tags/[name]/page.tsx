@@ -5,7 +5,6 @@ import { Tag } from '@/types/tag'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import Link from 'next/link'
 import { Edit, MailQuestion, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
@@ -62,7 +61,7 @@ export default function TagPage() {
       tags: ['react', 'javascript'],
     }
   ]
-  const handleRequireLogin = (toastTitle: String) => {
+  const handleRequireLogin = (toastTitle: string) => {
     router.push('/login');
     setTimeout(() => {
       toast("You must be logged in to " + toastTitle + " on The Bug", {

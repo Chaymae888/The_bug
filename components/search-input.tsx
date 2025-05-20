@@ -3,7 +3,7 @@
 import React from 'react'
 import { Input } from './ui/input'
 import { Search } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/utils'
 interface SearchInputProps {
     placeholder?: string
     className?: string

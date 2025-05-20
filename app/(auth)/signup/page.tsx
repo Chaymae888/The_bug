@@ -1,35 +1,15 @@
 'use client'
-
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, EyeOff, Github, Mail } from 'lucide-react'
-import { useAuthStore } from '@/lib/stores/useAuthStore'
-import { useRouter } from 'next/navigation'
+import useSignup from '@/hooks/use-signup'
 
 export default function Signup() {
-  const [username ,setUsername] =useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const {signup}=useAuthStore() 
-  const router = useRouter()
+  const { register, handleSubmit, errors, showPassword, setShowPassword, handleOAuthLogin } = useSignup()
 
-  const handleSignup = async (e: React.FormEvent) => {
-  e.preventDefault();
-  console.log('Signup attempt started');
   
-  try {
-    await signup({ username, email, password });
-    router.push('/emailconfirmation');
-  } catch (error) {
-    console.error('Registration error:', error instanceof Error ? error.message : 'Signup failed');
-    // Set error state here if needed
-  }
-};
   
     return (
       <motion.div
@@ -45,22 +25,31 @@ export default function Signup() {
           </p>
         </div>
   
-        <form className='space-y-4 p-5' onSubmit={handleSignup}>
+        <form className='space-y-4 p-5' onSubmit={handleSubmit}>
           <div className='space-y-2'>
             <Label htmlFor='username' className='text-sm text-textPrimary font-semibold'>Username</Label>
-            <Input type='username' id='username' placeholder='Enter your usrname' value={username} required onChange={(e) => setUsername(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
+            <Input type='username' id='username' placeholder='Enter your usrname' className='border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary' {...register('username')} />
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='email' className='text-sm text-textPrimary font-semibold'>Email</Label>
-            <Input type='email' id='email' placeholder='Enter your email' value={email} required onChange={(e) => setEmail(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
+            <Input type='email' id='email' placeholder='Enter your email'  className='border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary' {...register('email')} />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='password' className='text-sm text-textPrimary font-semibold'>Password</Label>
             <div className='relative'>
-              <Input type={showPassword ? 'text' : 'password'} id='password' placeholder='Enter your password' value={password} required onChange={(e) => setPassword(e.target.value)} className={'border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary'} />
+              <Input type={showPassword ? 'text' : 'password'} id='password' placeholder='Enter your password' className='border-0 focus-visible:border-0 rounded-full focus-visible:ring-0 bg-backgroundPrimary placeholder:text-textSecondary' {...register('password')}/>
               <button type='button' onClick={() => setShowPassword(!showPassword)} className='absolute right-3 top-1/2 transform -translate-y-1/2'>
                 {showPassword ? <EyeOff className='text-textSecondary' /> : <Eye className='text-textSecondary' />}
               </button>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+              )}
             </div>
           </div>
           

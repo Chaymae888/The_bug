@@ -10,12 +10,12 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import React, { useEffect } from 'react';
-import Theme from './plugins/Theme';
+import Theme from './Theme';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
-import { LinkNode, AutoLinkNode } from '@lexical/link';
+import { LinkNode} from '@lexical/link';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { ImageNode, registerImageNode } from '@/nodes/ImageNode';
+import { ImageNode, registerImageNode } from '@/components/editor/nodes/ImageNode';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;

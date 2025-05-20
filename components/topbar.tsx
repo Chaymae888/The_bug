@@ -1,20 +1,16 @@
 'use client'
 import React from 'react'
-import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { Search, Sun, Moon } from 'lucide-react'
+import {  Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/context/ThemeContext'
 import SearchInput from './search-input'
 import Link from 'next/link'
-import { useAuthStore } from '@/lib/stores/useAuthStore'
 
 import NoteIcon from './noteicon'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import Image from 'next/image'
 
 const Topbar = () => {
   const { theme, toggleTheme } = useTheme()
-  const { isAuthenticated } = useAuthStore()
   return (
     <div className='relative bg-backgroundSecondary w-full top-0 left-0 h-16 border border-borderColor flex items-center justify-between px-4 '>
       <SearchInput placeholder='Search for a question' />
