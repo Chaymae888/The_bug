@@ -1,10 +1,10 @@
-import { $createParagraphNode, $getSelection } from 'lexical';
+import {$createParagraphNode, $getSelection, LexicalEditor} from 'lexical';
 import { $setBlocksType } from '@lexical/selection';
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { $createCodeNode } from '@lexical/code';
 import {useCallback} from "react";
 
-export function useBlockFormatting(editor: any, activeBlock: string | null) {
+export function useBlockFormatting(editor:  LexicalEditor, activeBlock: string | null) {
     const toggleBlock = useCallback((type: 'h1' | 'h2' | 'h3' | 'quote' | 'code') => {
         const selection = $getSelection();
 
