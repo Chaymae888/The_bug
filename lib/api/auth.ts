@@ -1,4 +1,5 @@
-import { api } from './endpoints';
+import { User } from '@/types/user';
+import { api, UserInfo } from './endpoints';
 
 // lib/api/auth.ts
 type InfoUser = {
@@ -14,22 +15,15 @@ type AuthResponse = {
 };
 
 // Signup
-export const signup = async (user: InfoUser): Promise<void> => {
+export const signup = async (user: UserInfo): Promise<User> => {
   const res = await api.register.signup(user);
-  const contentType = res.headers.get('content-type');
-  
-  if (contentType && contentType.includes('text/html')) {
-    if (!res.ok) {
-      throw new Error('Registration failed - server returned HTML');
-    }
-    return; // Success case for HTML response
-  }
-
   const data = await res.json();
+  
   if (!res.ok) {
     throw new Error(data.message || 'Registration failed');
   }
-  // Success case for JSON response
+  
+  return data;
 }; 
   
 
@@ -59,9 +53,3 @@ export const refreshToken = async (): Promise<AuthResponse> => {
   return res.json();
 };
 
-// OAuth Success (Google/Github)
-export const fetchOAuthSuccess = async (): Promise<AuthResponse> => {
-  const res = await api.oauth2.success();
-  if (!res.ok) throw new Error('OAuth failed');
-  return res.json();
-};
