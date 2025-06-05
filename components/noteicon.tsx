@@ -1,8 +1,8 @@
 // components/NoteIcon.jsx
 interface NoteIconProps {
   className?: string;
-  color?: string;      // Main color
-  opacityColor?: string; // Color for opacity paths
+  color?: string;
+  opacityColor?: string;
 }
 
 export default function NoteIcon({

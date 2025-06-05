@@ -1,7 +1,7 @@
 'use client'
 
-import StickBug from '@/components/StickBug'
-import styles from '@/components/StickBug.module.css'
+import StickBug from '@/components/stickbug/StickBug'
+import styles from '@/components/stickbug/StickBug.module.css'
 import Image from 'next/image'
 import logo_light from '@/public/assets/images/bug-logo-light.png'
 import logo_dark from '@/public/assets/images/bug-logo-dark.png'

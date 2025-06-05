@@ -150,7 +150,7 @@
     left: 13.5vmin;
     transform: rotate(-38deg);
     top: 7vmin;
-    border-radius: 0% 50% 100% 100%;
+    border-radius: 0 50% 100% 100%;
     animation: left-2-leg-segment-movement 1s infinite ease-in-out 0.3s;
     transform-origin: left center;
 }
@@ -347,8 +347,8 @@
   @keyframes right-2-leg-segment-movement {
     0%, 100% {
       transform: 
-        rotate(var(--base-angle)) /* Original rotation */
-        translateY(5px) translateX(5px); /* New translation */
+        rotate(var(--base-angle)) 
+        translateY(5px) translateX(5px);
     }
     50% {
       transform:
