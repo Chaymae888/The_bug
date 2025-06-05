@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import {useEffect, useRef, useState} from 'react'
 import { notFound, useParams } from 'next/navigation'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -22,6 +22,11 @@ import { Editor } from '@/components/editor/Editor'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { nanoid } from 'nanoid'
+import {checkToxicity} from "@/lib/api/check_comments";
+
+
+
+
 
 interface QuestionData {
     id: string
@@ -48,9 +53,12 @@ const initialConfig = {
 }
 
 export default function QuestionPage() {
+    const [editorPlainText, setEditorPlainText] = useState('')
     const params = useParams()
     const [question, setQuestion] = useState<QuestionData | null>(null)
     const [editorContent, setEditorContent] = useState('')
+
+    const [isToxic, setIsToxic] = useState(false);
 
     useEffect(() => {
         const data = sessionStorage.getItem(`question-${params.id}`)
@@ -73,6 +81,23 @@ export default function QuestionPage() {
             notFound()
         }
     }, [params.id])
+
+    const checkContentToxicity = async () => {
+        if (!editorPlainText.trim()) return;
+        try {
+            const result = await checkToxicity(editorPlainText);
+            setIsToxic(
+                result.toxic ||
+                result.severe_toxic ||
+                result.obscene ||
+                result.threat ||
+                result.insult ||
+                result.identity_hate
+            );
+        } catch (error) {
+            console.error('Toxicity check failed:', error);
+        }
+    };
 
     if (!question) return <div>Loading...</div>
 
@@ -170,10 +195,30 @@ export default function QuestionPage() {
             </div>
             <div className='flex h-fit mt-10 flex-col h-full min-h-[400px] bg-transparent'> 
                 <h1 className='px-6 text-textPrimary text-xl pb-10'>Your answer</h1>
-                <Editor onSave={setEditorContent}/>
-                <Button onClick={()=>{}} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post your answer</Button>
+                <Editor onSave={(content) => {
+                    // Maintain existing functionality
+                    setEditorContent(content);
+                }}
+                        onTextExtract={(plainText) => {
+                            // Get plain text for toxicity checking
+                            setEditorPlainText(plainText);
+                        }}/>
+                <Button onClick={async () => {
+                    console.log(`Current text: ${editorPlainText}`);
+                    await checkContentToxicity();
+                    if (isToxic) {
+                        alert('Your content contains toxic language. Please revise before posting.');
+                        return;
+                    }
+                    // Proceed with submission
+                }} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post your answer</Button>
         
             </div>
+            {isToxic && (
+                <div className="mt-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
+                    Warning: Your content contains potentially toxic language. Please review before posting.
+                </div>
+            )}
         </div>
     )
 }

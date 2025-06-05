@@ -16,12 +16,18 @@ import { LinkNode} from '@lexical/link';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { ImageNode, registerImageNode } from '@/components/editor/nodes/ImageNode';
+import {$getRoot} from "lexical";
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
 }
 
-function EditorContent({ onSave }: { onSave: (content: string) => void }) {
+interface EditorProps {
+  onSave: (content: string) => void;
+  onTextExtract?: (plainText: string) => void; // New prop for plain text extraction
+}
+
+function EditorContent({ onSave, onTextExtract }: EditorProps)  {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -29,9 +35,14 @@ function EditorContent({ onSave }: { onSave: (content: string) => void }) {
       editorState.read(() => {
         const json = editorState.toJSON();
         onSave(JSON.stringify(json));
+        if (onTextExtract) {
+          const root = $getRoot();
+          const plainText = root.getTextContent();
+          onTextExtract(plainText);
+        }
       });
     });
-  }, [editor, onSave]);
+  }, [editor, onSave, onTextExtract]);
 
   return (
     <>
@@ -51,7 +62,7 @@ function EditorContent({ onSave }: { onSave: (content: string) => void }) {
   );
 }
 
-export function Editor({ onSave }: { onSave: (content: string) => void }) {
+  export function Editor({ onSave ,onTextExtract }: EditorProps) {
   const initialConfig = registerImageNode({
     namespace: 'Editor',
     onError: (error: Error) => {
@@ -74,7 +85,7 @@ export function Editor({ onSave }: { onSave: (content: string) => void }) {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-container size-full">
-        <EditorContent onSave={onSave} />
+        <EditorContent onSave={onSave} onTextExtract={onTextExtract} />
       </div>
     </LexicalComposer>
   );
