@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:8000';
+const BACKEND_URL = 'http://localhost:8080';
+
+const AI_URL ='http://localhost:8000';
 
 
 const API_KEYS = {
@@ -24,7 +26,7 @@ export type UserInfo = {
 export const api = {
   auth: {
     login: (credentials: { email: string; password: string }) => 
-      fetch(`${BASE_URL}/${API_KEYS.auth.login}`, {
+      fetch(`${BACKEND_URL}/${API_KEYS.auth.login}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
@@ -35,7 +37,7 @@ export const api = {
   },
   register: {
     signup: (user: UserInfo) =>
-      fetch(`${BASE_URL}/${API_KEYS.register.signup}`, { 
+      fetch(`${BACKEND_URL}/${API_KEYS.register.signup}`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
@@ -47,7 +49,7 @@ export const api = {
       fetch(API_KEYS.register.confirmEmail, { method: 'GET', body: JSON.stringify({ token }) }),
   },
     checkComment :(text: string) =>
-        fetch(`${BASE_URL}/${API_KEYS.predictToxicity}`, {
+        fetch(`${AI_URL}/${API_KEYS.predictToxicity}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
