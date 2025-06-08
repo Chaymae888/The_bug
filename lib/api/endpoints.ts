@@ -10,9 +10,13 @@ const API_KEYS = {
   },
   register: {
     signup: 'api/register/users',
+    confirmEmail :'api/register/users/confirmation',
     exchangeToken:'api/users/exchange-token'
   },
-    predictToxicity : 'predict'
+    predictToxicity : 'predict',
+    questions:{
+      ask:'api/questions'
+    }
 } as const;
 
 
@@ -21,6 +25,12 @@ export type UserInfo = {
   email: string;
   password: string;
 };
+
+export type QuestionInfo={
+    title:string;
+    content:string;
+    tagNames:string[];
+}
 
 export const api = {
   auth: {
@@ -43,6 +53,13 @@ export const api = {
       },
         body: JSON.stringify({infoUser:user})
     }),
+    confirmEmail:(token : string)=>
+      fetch(`${BACKEND_URL}/${API_KEYS.register.confirmEmail}?token=${token}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      }),
     exchangeToken:(token: string)=>
         fetch(`${BACKEND_URL}/${API_KEYS.register.exchangeToken}`,{
             method: 'POST',
@@ -61,6 +78,16 @@ export const api = {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ text }),
-        })
+        }),
+    questions: {
+      ask :(question:QuestionInfo,accessToken:string)=>
+          fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}`,{
+              method: 'POST',
+              headers:{
+                  'Authorization': accessToken,
+              },
+              body:JSON.stringify(question)
+          })
+    }
   
 } as const;

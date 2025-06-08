@@ -49,7 +49,11 @@ const items = [
 export function AppSidebar() {
   const pathname = usePathname();
   const [showLogoutDialog,setShowLogoutDialog]=useState(false);
-  const {isAuthenticated}=useAuthStore();
+  const {isAuthenticated ,hydrated}=useAuthStore();
+
+  if (!hydrated) {
+    return null; // Or a loading skeleton
+  }
 
   const handleLogout = () => {
     // Add your logout logic here

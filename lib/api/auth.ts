@@ -1,13 +1,7 @@
 import { User } from '@/types/user';
 import { api, UserInfo } from './endpoints';
 
-// lib/api/auth.ts
-type InfoUser = {
-  username:string;
-  email: string;
-  password: string;
-  
-};
+
 
 type AuthResponse = {
   accessToken: string;
@@ -27,7 +21,7 @@ export const signup = async (user: UserInfo): Promise<User> => {
 };
 
 // Login
-export const login = async (user: Omit<InfoUser, 'username'>): Promise<AuthResponse> => {
+export const login = async (user: Omit<UserInfo, 'username'>): Promise<AuthResponse> => {
   const res = await api.auth.login(user);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
@@ -45,6 +39,12 @@ export const exchangeToken = async (token : string): Promise<string>=>{
   if (!res.ok) throw new Error('Token exchange failed');
   const data = await res.json();
   return data['access-token'];
+}
+
+export const confirmEmail=async(token:string):Promise<string>=>{
+  const res=await api.register.confirmEmail(token);
+    if (!res.ok) throw new Error('Confirmation failed');
+  return await res.json();
 }
 
 

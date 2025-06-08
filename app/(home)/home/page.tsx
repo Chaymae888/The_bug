@@ -60,8 +60,12 @@ const Home = () => {
     }
   ]
   const router = useRouter();
-  const {isAuthenticated}=useAuthStore()
+  const {isAuthenticated, hydrated}=useAuthStore()
   const [followings, setFollowings] = useState<string[]>([])
+
+  if (!hydrated) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
   
 
   const handleClick = (username: string) => {

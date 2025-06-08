@@ -1,5 +1,5 @@
 'use client'
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import { notFound, useParams } from 'next/navigation'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -28,12 +28,7 @@ import {checkToxicity} from "@/lib/api/check_comments";
 
 
 
-interface QuestionData {
-    id: string
-    title: string
-    tags: string[]
-    content: string
-}
+
 const initialConfig = {
     namespace: 'QuestionViewer',
     editable: false,
@@ -55,7 +50,7 @@ const initialConfig = {
 export default function QuestionPage() {
     const [editorPlainText, setEditorPlainText] = useState('')
     const params = useParams()
-    const [question, setQuestion] = useState<QuestionData | null>(null)
+    const [question, setQuestion] = useState<Question | null>(null)
     const [editorContent, setEditorContent] = useState('')
 
     const [isToxic, setIsToxic] = useState(false);

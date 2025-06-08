@@ -8,11 +8,14 @@ import Link from 'next/link'
 
 import NoteIcon from './noteicon'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { useAuthStore } from "@/lib/stores/useAuthStore"
+import { useAuthStore  } from "@/lib/stores/useAuthStore"
 
 const Topbar = () => {
   const { theme, toggleTheme } = useTheme()
-  const {isAuthenticated , user}=useAuthStore()
+  const {isAuthenticated , user ,hydrated}=useAuthStore()
+    if (!hydrated) {
+        return null; // Or a loading skeleton
+    }
 
   return (
     <div className='relative bg-backgroundSecondary w-full top-0 left-0 h-16 border border-borderColor flex items-center justify-between px-4 '>

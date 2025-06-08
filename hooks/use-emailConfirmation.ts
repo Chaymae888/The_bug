@@ -5,10 +5,11 @@ import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { useAuthStore } from "@/lib/stores/useAuthStore"
 
+
 export const useEmailConfirmation = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const {exchangeToken}=useAuthStore();
+    const {exchangeToken, confirmEmail}=useAuthStore();
 
     useEffect(() => {
         const token = searchParams.get('token');
@@ -23,6 +24,9 @@ export const useEmailConfirmation = () => {
 
         const verifyAndExchangeToken = async () => {
             try {
+                console.log(`[Confirmation] attempting to verify token with API`)
+                await confirmEmail(token);
+                console.log('[Confirmation] Email confirmation successful')
                 console.log('[Confirmation] Exchanging token for JWT');
                 await exchangeToken(token);
 
@@ -44,5 +48,5 @@ export const useEmailConfirmation = () => {
         };
 
         verifyAndExchangeToken();
-    }, [searchParams, router, exchangeToken]);
+    }, [searchParams, router, exchangeToken, confirmEmail]);
 };

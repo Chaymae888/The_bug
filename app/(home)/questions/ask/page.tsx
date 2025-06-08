@@ -6,6 +6,8 @@ import React, { useState } from 'react'
 import {SelectTags} from '@/components/SelectTags'
 import { useRouter } from 'next/navigation'
 import { nanoid } from 'nanoid'
+import {useAuthStore} from "@/lib/stores/useAuthStore";
+import {addQuestion} from "@/lib/api/questions_management";
 
 
 export default function Ask() {
@@ -13,17 +15,21 @@ export default function Ask() {
   const [title, setTitle] = useState('');
   const [editorContent, setEditorContent] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const {accessToken} = useAuthStore()
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formData = {
       title,
       content: editorContent,
-      tags: selectedTags,
-    }
-    const id = nanoid()
-    sessionStorage.setItem(`question-${id}`, JSON.stringify(formData))
-    
-    router.push(id)
+      tagNames: selectedTags,
+    };
+      try{
+          const question = await addQuestion(formData, accessToken);
+          sessionStorage.setItem(`question-${question.id}`, JSON.stringify(question))
+          router.push(`/questions/${question.id}`);
+      }catch (error) {
+          console.error('Failed to submit question:', error);
+      }
 
   }
   return (
