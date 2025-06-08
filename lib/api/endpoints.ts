@@ -6,12 +6,11 @@ const AI_URL ='http://localhost:8000';
 const API_KEYS = {
   auth: {
     login: 'auth/login/user',
-    logout: 'auth/logout',
     refreshToken: 'auth/refresh-token',
   },
   register: {
     signup: 'api/register/users',
-    confirmEmail: 'register/users/confirmation',
+    exchangeToken:'api/users/exchange-token'
   },
     predictToxicity : 'predict'
 } as const;
@@ -33,7 +32,6 @@ export const api = {
       }),
     refreshToken: () => 
         fetch(API_KEYS.auth.refreshToken, { method: 'POST' }),
-    logout: () => fetch(API_KEYS.auth.logout, { method: 'POST' }),
   },
   register: {
     signup: (user: UserInfo) =>
@@ -45,8 +43,16 @@ export const api = {
       },
         body: JSON.stringify({infoUser:user})
     }),
-    confirmEmail: (token: string) => 
-      fetch(API_KEYS.register.confirmEmail, { method: 'GET', body: JSON.stringify({ token }) }),
+    exchangeToken:(token: string)=>
+        fetch(`${BACKEND_URL}/${API_KEYS.register.exchangeToken}`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+
+        })
+
   },
     checkComment :(text: string) =>
         fetch(`${AI_URL}/${API_KEYS.predictToxicity}`, {

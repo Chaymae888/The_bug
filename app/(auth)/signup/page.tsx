@@ -7,7 +7,7 @@ import { Eye, EyeOff, Github, Mail } from 'lucide-react'
 import useSignup from '@/hooks/use-signup'
 
 export default function Signup() {
-  const { register, handleSubmit, errors, showPassword, setShowPassword, handleOAuthLogin } = useSignup()
+  const { register, handleSubmit, errors, showPassword, setShowPassword } = useSignup()
 
   
   

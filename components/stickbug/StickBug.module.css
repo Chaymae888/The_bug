@@ -347,7 +347,7 @@
   @keyframes right-2-leg-segment-movement {
     0%, 100% {
       transform: 
-        rotate(var(--base-angle)) 
+        rotate(var(--base-angle))
         translateY(5px) translateX(5px);
     }
     50% {

@@ -77,7 +77,7 @@ const Home = () => {
       <div className='flex flex-col md:w-2/3 p-5 h-screen'>
         <div className='flex justify-between'>
           <h1 className='font-bold text-textPrimary'>Newest questions </h1>
-          <Button variant="outline" className='cursor-pointer bg-buttons text-backgroundPrimary rounded-full ' onClick={true ? () => { router.push('/questions/ask') } : () => { handleRequireLogin("ask a question", router) }}>Add a question</Button>
+          <Button variant="outline" className='cursor-pointer bg-buttons text-backgroundPrimary rounded-full ' onClick={isAuthenticated ? () => { router.push('/questions/ask') } : () => { handleRequireLogin("ask a question", router) }}>Add a question</Button>
         </div>
         <div className='space-y-4 pt-4'>
           {questions.map((question) => (
@@ -95,7 +95,7 @@ const Home = () => {
                   </div>
                 </div>
                 <Button onClick={() =>{
-    if (true) {
+    if (isAuthenticated) {
       setFollowings(prev => 
       prev.includes(question.username) 
         ? prev.filter(name => name !== question.username)  

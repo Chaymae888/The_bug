@@ -1,6 +1,6 @@
 "use client";
 
-import { Tag,Home, MessageCircle, Users} from "lucide-react"
+import { Tag,Home,LogOut, Users} from "lucide-react"
 
 import {
   Sidebar,
@@ -12,7 +12,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { usePathname } from "next/navigation";
+import React, {useState} from "react";
+import {Button} from "@/components/ui/button";
+import {useAuthStore} from "@/lib/stores/useAuthStore";
 
 // Menu items.
 const items = [
@@ -26,31 +37,29 @@ const items = [
     url: "/tags",
     icon: Tag,
   },
-  // {
-  //   title: "Posts",
-  //   url: "/discussions",
-  //   icon: Newspaper,
-  // },
-  {
-    title: "Chats",
-    url: "/chats",
-    icon: MessageCircle,
-  },
   {
     title: "Users",
     url: "/users",
     icon: Users,
-  },
-  // {
-  //   title: "Settings",
-  //   url: "/settings",
-  //   icon: Settings,
-  // },
+  }
 ]
+
+
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [showLogoutDialog,setShowLogoutDialog]=useState(false);
+  const {isAuthenticated}=useAuthStore();
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log("User logged out");
+    // Typically you would:
+    // 1. Clear auth tokens
+    // 2. Redirect to login page
+  };
   return (
+      <>
     <Sidebar collapsible="icon">
       <SidebarHeader/>
       <SidebarContent className="pt-20" >
@@ -67,10 +76,36 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {isAuthenticated &&(<SidebarMenuItem>
+                <SidebarMenuButton className='cursor-pointer' onClick={() => setShowLogoutDialog(true)}>
+                  <LogOut/>
+                  <span>Logout</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="sm:max-w-[425px] bg-backgroundSecondary border-borderColor">
+          <DialogHeader>
+            <DialogTitle >Are you sure you want to logout</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className='border-borderColor text-buttons'>Cancel</Button>
+            </DialogClose>
+            <Button
+                type="submit"
+                className='border-buttons text-buttons'
+                onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      </>
   )
 }

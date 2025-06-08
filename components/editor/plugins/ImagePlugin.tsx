@@ -1,9 +1,7 @@
 'use client'
 import React, { useRef } from 'react'
-import { IconButton } from '@chakra-ui/react'
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { compileFunction } from 'vm';
 import { Input } from '@/components/ui/input';
 import {
     Dialog,
@@ -17,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createImageNode } from '@/components/editor/nodes/ImageNode';
-import { $getRoot, $insertNodes } from 'lexical';
+import { $insertNodes } from 'lexical';
 
 export default function ImagePlugin() {
     const [url, setUrl] = React.useState('');

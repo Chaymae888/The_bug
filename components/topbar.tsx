@@ -8,9 +8,12 @@ import Link from 'next/link'
 
 import NoteIcon from './noteicon'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { useAuthStore } from "@/lib/stores/useAuthStore"
 
 const Topbar = () => {
   const { theme, toggleTheme } = useTheme()
+  const {isAuthenticated , user}=useAuthStore()
+
   return (
     <div className='relative bg-backgroundSecondary w-full top-0 left-0 h-16 border border-borderColor flex items-center justify-between px-4 '>
       <SearchInput placeholder='Search for a question' />
@@ -22,7 +25,7 @@ const Topbar = () => {
         >
           {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
         </button>
-        {true ? (<div className='flex items-center justify-center gap-2 '>
+        {isAuthenticated ? (<div className='flex items-center justify-center gap-2 '>
           <Link
             id="open_msg_box"
             className="hasnotifications nav-link relative" href={''}          >
@@ -31,8 +34,8 @@ const Topbar = () => {
           </Link>
 
           <div className='flex flex-col items-end text-sm'>
-            <h1 >Username</h1>
-            <h1 className='text-gray-500'> job</h1>
+            <h1 >{user?.infoUser.username}</h1>
+            <h1 className='text-gray-500'> {user?.infoUser.email}</h1>
           </div>
           <Link href="/profile" passHref>
             <Avatar className="cursor-pointer h-[7vh] w-[7vh] rounded-[10px]">

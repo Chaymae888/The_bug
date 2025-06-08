@@ -11,7 +11,7 @@ type InfoUser = {
 
 type AuthResponse = {
   accessToken: string;
-  refreshToken: string;
+  user: User;
 };
 
 // Signup
@@ -24,14 +24,6 @@ export const signup = async (user: UserInfo): Promise<User> => {
   }
   
   return data;
-}; 
-  
-
-
-// Email Confirmation
-export const confirmEmail = async (token: string): Promise<void> => {
-  const res = await api.register.confirmEmail(token);
-  if (!res.ok) throw new Error('Confirmation failed');
 };
 
 // Login
@@ -41,15 +33,19 @@ export const login = async (user: Omit<InfoUser, 'username'>): Promise<AuthRespo
   return res.json();
 };
 
-// Logout
-export const logout = async (): Promise<void> => {
-  await api.auth.logout();
-};
-
 // Refresh Token
 export const refreshToken = async (): Promise<AuthResponse> => {
   const res = await api.auth.refreshToken();
   if (!res.ok) throw new Error('Token refresh failed');
   return res.json();
 };
+
+export const exchangeToken = async (token : string): Promise<string>=>{
+  const res = await api.register.exchangeToken(token);
+  if (!res.ok) throw new Error('Token exchange failed');
+  const data = await res.json();
+  return data['access-token'];
+}
+
+
 
