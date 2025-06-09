@@ -4,7 +4,7 @@ import { api, UserInfo } from './endpoints';
 
 
 type AuthResponse = {
-  accessToken: string;
+  "access-token": string;
   user: User;
 };
 

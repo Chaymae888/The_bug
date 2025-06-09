@@ -17,52 +17,50 @@ import { handleRequireLogin } from '@/lib/utils/authUtils';
 import {Question} from "@/types/question";
 import {
   downvoteQuestion,
-  followQuestion,
+  followQuestion, getFollowedQuestions,
   getQuestions,
   unfollowQuestion,
-  upvoteQuestion
+  upvoteQuestion,
+    getVoters
 } from "@/lib/api/questions_management";
 import {User} from "@/types/user";
-import {followUser, unfollowUser} from "@/lib/api/users_management";
+import {followUser, getFollowings, unfollowUser} from "@/lib/api/users_management";
 import {toast} from "sonner";
 
 
 
 const Home = () => {
   const router = useRouter();
-  const {isAuthenticated, hydrated, accessToken, user, setUser} = useAuthStore()
+  const {isAuthenticated, hydrated, accessToken, user, setUser ,followings,followedQuestions,setFollowings,setFollowedQuestions} = useAuthStore()
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    const fetchQuestions = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
+        setError(null);
+
         const fetchedQuestions = await getQuestions();
         setQuestions(fetchedQuestions);
-        setError(null);
+
+        if (user?.userId && accessToken) {
+          const userFollowings = await getFollowings(user.userId);
+          setFollowings(userFollowings);
+          const userFollowedQuestions = await getFollowedQuestions(accessToken);
+          setFollowedQuestions(userFollowedQuestions)
+        }
       } catch (err) {
-        console.error('Failed to fetch questions:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load questions');
+        console.error('Failed to fetch data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchQuestions();
-  }, []);
-  if (!hydrated) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
+    fetchData();
+  }, [user?.userId]);
 
-
-  if (loading) {
-    return <div>Loading questions...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
   const handleClick = (username: string) => {
     const urlSafeName = username.toLowerCase()
         .replace(/\s+/g, '-')
@@ -77,137 +75,95 @@ const Home = () => {
 
   const togglefollowUser = async (userToToggle: User) => {
     try {
-      if (!user) {
-        console.error('No user logged in');
+
+      if (!user || !accessToken) {
+        handleRequireLogin('follow someone', router);
         return;
       }
-      if (!accessToken) {
-        console.error('Your session is expired you should login again');
-        return;
-
-      }
-
-      const isFollowing = user.userFollowings.some(
+      const isFollowing = followings?.some(
           following => following.userId === userToToggle.userId
-      );
-      const updatedUser = {
-        ...user,
-        userFollowings: isFollowing
-            ? user.userFollowings.filter(f => f.userId !== userToToggle.userId)
-            : [...user.userFollowings, userToToggle]
-      };
-      setUser(updatedUser);
+      ) ?? false;
+
       if (isFollowing) {
         await unfollowUser(userToToggle.userId, accessToken);
       } else {
         await followUser(userToToggle.userId, accessToken);
       }
+
+      const updatedFollowings = isFollowing
+          ? followings?.filter(f => f.userId !== userToToggle.userId) ?? null
+          : [...(followings || []), userToToggle];
+      setFollowings(updatedFollowings)
     } catch (err) {
       console.error('Failed to toggle follow:', err);
-      setUser(user);
     }
   }
   const togglefollowQuestion = async (questionToToggle: Question) => {
     try {
-      if (!user) {
-        console.error('No user logged in');
+      if (!user || !accessToken) {
+        handleRequireLogin('follow question', router);
         return;
       }
-      if (!accessToken) {
-        console.error('Your session is expired you should login again');
-        return;
 
-      }
-
-      const isFollowing = user.questionsFollowings.some(
+      const isFollowing = followedQuestions?.some(
           following => following.id === questionToToggle.id
-      );
-      const updatedUser = {
-        ...user,
-        questionsFollowings: isFollowing
-            ? user.questionsFollowings.filter(f => f.id !== questionToToggle.id)
-            : [...user.questionsFollowings, questionToToggle]
-      };
-      setUser(updatedUser);
+      ) ?? false;
+
       if (isFollowing) {
         await unfollowQuestion(questionToToggle.id, accessToken);
       } else {
         await followQuestion(questionToToggle.id, accessToken);
       }
+      const updatedFollowedQuestions = isFollowing
+          ? followedQuestions?.filter(f => f.id !== questionToToggle.id) ?? null
+          : [...(followedQuestions || []), questionToToggle];
+      setFollowedQuestions(updatedFollowedQuestions)
     } catch (err) {
       console.error('Failed to toggle follow:', err);
       setUser(user);
     }
   }
-  const upvote = async (questionToToggle: Question) => {
+  const handleVote = async (questionId: number, isUpvote: boolean) => {
     try{
-      if (!user) {
-        console.error('No user logged in');
+      if (!user || !accessToken) {
+        handleRequireLogin('vote', router);
         return;
       }
-      if (!accessToken) {
-        console.error('Your session is expired you should login again');
+
+      const voters = await getVoters(questionId);
+      const alreadyVoted = voters.some(voter => voter.userId === user.userId);
+      if (alreadyVoted) {
+        toast.error("You have already voted");
         return;
-
       }
-      const alreadyUpVoted = questionToToggle.upvotersId.some(
-          upvoterId => upvoterId === user.userId
-      );
-      if (alreadyUpVoted) {
-        toast.error("You have already upvoted");
-      }else{
-        const alreadyDownVoted = questionToToggle.downvotersId.some(
-            downvoterId => downvoterId === user.userId
-        );
-        if (alreadyDownVoted) {
-          toast.error("You can't downvote and upvote a question");
-        }else{
-          await upvoteQuestion(questionToToggle.id, accessToken);
-
-        }
+      if (isUpvote) {
+        await upvoteQuestion(questionId, accessToken);
+      } else {
+        await downvoteQuestion(questionId, accessToken);
       }
+
+      const updatedQuestions = await getQuestions();
+      setQuestions(updatedQuestions);
 
 
     }catch (err) {
-      console.error('Failed to toggle upvote:', err);
-      setUser(user);
-    }
-  }
-  const downvote = async (questionToToggle: Question) => {
-    try{
-      if (!user) {
-        console.error('No user logged in');
-        return;
-      }
-      if (!accessToken) {
-        console.error('Your session is expired you should login again');
-        return;
-
-      }
-      const alreadyUpVoted = questionToToggle.upvotersId.some(
-          upvoterId => upvoterId === user.userId
-      );
-      if (alreadyUpVoted) {
-        toast.error("You can't downvote and upvote a question");
-      }else{
-        const alreadyDownVoted = questionToToggle.downvotersId.some(
-            downvoterId => downvoterId === user.userId
-        );
-        if (alreadyDownVoted) {
-          toast.error("You have already downvoted");
-        }else{
-          await downvoteQuestion(questionToToggle.id, accessToken);
-
-        }
-      }
-
-
-    }catch (err) {
-      console.error('Failed to toggle upvote:', err);
-      setUser(user);
+      console.error('Failed to vote:', err);
+      toast.error('Failed to process your vote');
     }
   }
 
+  if (!hydrated) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+
+  if (loading) {
+    return <div>Loading questions...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
         <div className='flex flex-col md:flex-row'>
@@ -245,7 +201,7 @@ const Home = () => {
                           handleRequireLogin('follow someone', router);
                         }
                       }}
-                              className='cursor-pointer bg-backgroundSecondary text-buttons border border-buttons rounded-full hover:bg-buttons hover:text-backgroundPrimary'>{user?.userFollowings.includes(question.user) ? 'Suivi(e)' : 'Suivre'}</Button>
+                              className='cursor-pointer bg-backgroundSecondary text-buttons border border-buttons rounded-full hover:bg-buttons hover:text-backgroundPrimary'>{followings?.includes(question.user) ? 'Suivi(e)' : 'Suivre'}</Button>
                     </div>
 
                     <h2 onClick={() => seeQuestionDetails(question)}
@@ -272,7 +228,7 @@ const Home = () => {
                           className='w-fit h-8 bg-backgroundPrimary border border-borderColor rounded-lg flex items-center justify-center space-x-2 px-2'>
                         <ThumbsUp onClick={() => {
                           if (isAuthenticated) {
-                            upvote(question)
+                            handleVote(question.id,true)
                           } else {
                             handleRequireLogin('vote', router);
                           }
@@ -281,14 +237,14 @@ const Home = () => {
                         <Separator orientation='vertical' className='h-4 w-0 bg-borderColor'/>
                         <ThumbsDown onClick={() => {
                           if (isAuthenticated) {
-                            downvote(question)
+                            handleVote(question.id,false)
                           } else {
                             handleRequireLogin('vote', router);
                           }
                         }} className='hover:text-buttons cursor-pointer w-4 h-4 text-icons-primary'/>
                         <span className='text-sm text-textSecondary'>34</span>
                       </div>
-                      {(!user || user?.infoUser.username !== question.user.infoUser.username) &&(<HoverCard><HoverCardTrigger>
+                      {(!user || user?.infoUser.username !== question.user.infoUser.username) &&(<><HoverCard><HoverCardTrigger>
                         <Edit onClick={() => {
                           if (isAuthenticated) {
                             document.getElementById('answer-section')?.scrollIntoView({
@@ -300,20 +256,21 @@ const Home = () => {
                         }} className='hover:text-buttons cursor-pointer w-6 h-6 text-textSecondary'/></HoverCardTrigger>
                         <HoverCardContent className='bg-backgroundSecondary w-fit h-fit border-borderColor '> Answer the
                           question </HoverCardContent>
-                      </HoverCard>)}
-                      <HoverCard>
-                        <HoverCardTrigger>
-                          <MailQuestion onClick={() => {
-                            if (isAuthenticated) {
-                              togglefollowQuestion(question)
-                            } else {
-                              handleRequireLogin('follow question', router);
-                            }
-                          }} className='hover:text-buttons cursor-pointer w-6 h-6 text-textSecondary'/>
-                        </HoverCardTrigger>
-                        <HoverCardContent className='bg-backgroundSecondary w-fit h-fit border-borderColor'> follow the
-                          question </HoverCardContent>
                       </HoverCard>
+                        <HoverCard>
+                        <HoverCardTrigger>
+                        <MailQuestion onClick={() => {
+                        if (isAuthenticated) {
+                        togglefollowQuestion(question)
+                      } else {
+                        handleRequireLogin('follow question', router);
+                      }
+                      }} className='hover:text-buttons cursor-pointer w-6 h-6 text-textSecondary'/>
+                  </HoverCardTrigger>
+                <HoverCardContent className='bg-backgroundSecondary w-fit h-fit border-borderColor'> follow the
+                question </HoverCardContent>
+                </HoverCard></>)}
+
 
                     </div>
                   </div>

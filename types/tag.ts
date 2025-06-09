@@ -6,6 +6,4 @@ export  interface Tag {
   name: string
   usageCount: number
   followersCount: number
-  followers:User[]
-  questions:Question[]
 }

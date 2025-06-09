@@ -1,5 +1,3 @@
-import {Question} from "@/types/question";
-import {Tag} from "@/types/tag";
 
 export interface User {
   userId: number,
@@ -22,7 +20,4 @@ export interface User {
   voteCount:number,
   answerCount:number,
   reachedCount:number,
-  userFollowings: User[],
-  questionsFollowings:Question[],
-  tagsfollowings:Tag[],
 }

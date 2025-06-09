@@ -1,5 +1,5 @@
 'use client'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import {notFound, useParams, useRouter} from 'next/navigation'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -26,15 +26,16 @@ import {Question} from "@/types/question";
 import {useAuthStore} from "@/lib/stores/useAuthStore";
 import {Separator} from "@/components/ui/separator";
 import {timeAgo} from "@/lib/utils/timeAgo";
-import {addAnswer} from "@/lib/api/answers_management";
-import {downvoteQuestion, followQuestion, unfollowQuestion, upvoteQuestion} from "@/lib/api/questions_management";
+import {addAnswer, getAnswerVoters, upvoteAnswer, downvoteAnswer} from "@/lib/api/answers_management";
+import {
+    downvoteQuestion,
+    followQuestion, getVoters,
+    unfollowQuestion,
+    upvoteQuestion
+} from "@/lib/api/questions_management";
 import {toast} from "sonner";
 import {handleRequireLogin} from "@/lib/utils/authUtils";
-
-
-
-
-
+import {Answer} from "@/types/answer";
 
 const initialConfig = {
     namespace: 'QuestionViewer',
@@ -52,7 +53,9 @@ const initialConfig = {
     ],
     onError: (error: Error) => console.error(error),
     theme: Theme
-}
+};
+
+const answers:Answer[] = [];
 
 export default function QuestionPage() {
     const router = useRouter();
@@ -63,27 +66,28 @@ export default function QuestionPage() {
 
     const [isToxic, setIsToxic] = useState(false);
 
-    const {user , accessToken, setUser, isAuthenticated} = useAuthStore();
+    const {user , accessToken, isAuthenticated,followedQuestions,setFollowedQuestions} = useAuthStore();
     useEffect(() => {
-        const data = sessionStorage.getItem(`question-${params.id}`)
-        if (data) {
+        const loadQuestion = () => {
+            const data = sessionStorage.getItem(`question-${params.id}`)
+            if (!data) {
+                notFound()
+                return
+            }
+
             try {
-                const parsedData = JSON.parse(data)
-                if (parsedData.content) {
-                    setQuestion({
-                        ...parsedData,
-                        content: parsedData.content
-                    })
-                } else {
+                const parsedData = JSON.parse(data) as Question
+                if (!parsedData.content) {
                     throw new Error('Invalid content')
                 }
-            } catch (e) {
-                console.error('Failed to parse question data:', e)
+                setQuestion(parsedData)
+            } catch (error) {
+                console.error('Failed to parse question data:', error)
                 notFound()
             }
-        } else {
-            notFound()
         }
+
+        loadQuestion()
     }, [params.id])
 
     const checkContentToxicity = async () => {
@@ -102,125 +106,110 @@ export default function QuestionPage() {
             console.error('Toxicity check failed:', error);
         }
     };
-    const answer = async () => {
-        try{
-            if (!accessToken) {
-                console.error('Your session is expired you should login again');
-                return;
-
-            }
-            if (!question) {
-                console.error('the question is missing');
-                return;
-
-            }
-            await checkContentToxicity;
-            if(isToxic) return;
-            else await addAnswer(question.id,editorContent,accessToken) ;
-        }catch(err){
-            console.error('Failed to add question:', err);
+    const answer = useCallback(async () => {
+        if (!accessToken || !question) {
+            console.error('Missing required data')
+            return
         }
-    };
-    const togglefollowQuestion = async (questionToToggle: Question) => {
+
+        await checkContentToxicity()
+        if (isToxic) {
+            toast.warning('Your content contains inappropriate language')
+            return
+        }
+
         try {
-            if (!user) {
-                console.error('No user logged in');
-                return;
-            }
-            if (!accessToken) {
-                console.error('Your session is expired you should login again');
-                return;
+            await addAnswer(question.id, editorContent, accessToken)
+            toast.success('Answer submitted successfully')
+            // Refresh answers or redirect
+        } catch (error) {
+            console.error('Failed to add answer:', error)
+            toast.error('Failed to submit answer')
+        }
+    }, [accessToken, question, editorPlainText, editorContent])
 
-            }
+    const toggleFollowQuestion = useCallback(async (questionToToggle: Question) => {
+        if (!user || !accessToken) {
+            handleRequireLogin('follow question', router)
+            return
+        }
 
-            const isFollowing = user.questionsFollowings.some(
-                following => following.id === questionToToggle.id
-            );
-            const updatedUser = {
-                ...user,
-                questionsFollowings: isFollowing
-                    ? user.questionsFollowings.filter(f => f.id !== questionToToggle.id)
-                    : [...user.questionsFollowings, questionToToggle]
-            };
-            setUser(updatedUser);
+        try {
+            const isFollowing = followedQuestions?.some(q => q.id === questionToToggle.id) ?? false
+
             if (isFollowing) {
-                await unfollowQuestion(questionToToggle.id, accessToken);
+                await unfollowQuestion(questionToToggle.id, accessToken)
             } else {
-                await followQuestion(questionToToggle.id, accessToken);
+                await followQuestion(questionToToggle.id, accessToken)
             }
-        } catch (err) {
-            console.error('Failed to toggle follow:', err);
-            setUser(user);
+
+            const updated = isFollowing
+                ? followedQuestions?.filter(q => q.id !== questionToToggle.id) ?? null
+                : [...(followedQuestions || []), questionToToggle]
+
+            setFollowedQuestions(updated)
+            toast.success(`Question ${isFollowing ? 'unfollowed' : 'followed'}`)
+        } catch (error) {
+            console.error('Failed to toggle follow:', error)
+            toast.error('Failed to update follow status')
         }
-    }
-    const upvote = async (questionToToggle: Question) => {
-        try{
-            if (!user) {
-                console.error('No user logged in');
-                return;
-            }
-            if (!accessToken) {
-                console.error('Your session is expired you should login again');
-                return;
+    }, [user, accessToken, followedQuestions, setFollowedQuestions, router])
 
-            }
-            const alreadyUpVoted = questionToToggle.upvotersId.some(
-                upvoterId => upvoterId === user.userId
-            );
-            if (alreadyUpVoted) {
-                toast.error("You have already upvoted");
-            }else{
-                const alreadyDownVoted = questionToToggle.downvotersId.some(
-                    downvoterId => downvoterId === user.userId
-                );
-                if (alreadyDownVoted) {
-                    toast.error("You can't downvote and upvote a question");
-                }else{
-                    await upvoteQuestion(questionToToggle.id, accessToken);
-
-                }
-            }
-
-
-        }catch (err) {
-            console.error('Failed to toggle upvote:', err);
-            setUser(user);
+    const handleVote = useCallback(async (questionId: number, isUpvote: boolean) => {
+        if (!user || !accessToken) {
+            handleRequireLogin('vote', router)
+            return
         }
-    }
-    const downvote = async (questionToToggle: Question) => {
-        try{
-            if (!user) {
-                console.error('No user logged in');
-                return;
-            }
-            if (!accessToken) {
-                console.error('Your session is expired you should login again');
-                return;
 
-            }
-            const alreadyUpVoted = questionToToggle.upvotersId.some(
-                upvoterId => upvoterId === user.userId
-            );
-            if (alreadyUpVoted) {
-                toast.error("You can't downvote and upvote a question");
-            }else{
-                const alreadyDownVoted = questionToToggle.downvotersId.some(
-                    downvoterId => downvoterId === user.userId
-                );
-                if (alreadyDownVoted) {
-                    toast.error("You have already downvoted");
-                }else{
-                    await downvoteQuestion(questionToToggle.id, accessToken);
+        try {
+            const voters = await getVoters(questionId)
+            const alreadyVoted = voters.some(v => v.userId === user.userId)
 
-                }
+            if (alreadyVoted) {
+                toast.error("You have already voted")
+                return
             }
 
+            if (isUpvote) {
+                await upvoteQuestion(questionId, accessToken);
+            } else {
+                await downvoteQuestion(questionId, accessToken);
+            }
 
-        }catch (err) {
-            console.error('Failed to toggle upvote:', err);
-            setUser(user);
+            // Optionally refresh question data
+        } catch (error) {
+            console.error('Failed to vote:', error)
+            toast.error('Failed to process your vote')
         }
-    }
+    }, [user, accessToken, router])
+
+    const handleAnswerVote = useCallback(async (answerId: number, isUpvote: boolean) => {
+        if (!user || !accessToken) {
+            handleRequireLogin('vote', router)
+            return
+        }
+
+        try {
+            const voters = await getAnswerVoters(answerId)
+            const alreadyVoted = voters.some(v => v.userId === user.userId)
+
+            if (alreadyVoted) {
+                toast.error("You have already voted")
+                return
+            }
+
+            if (isUpvote) {
+                await upvoteAnswer(answerId, accessToken);
+            } else {
+                await downvoteAnswer(answerId, accessToken);
+            }
+
+            // Optionally refresh question data
+        } catch (error) {
+            console.error('Failed to vote:', error)
+            toast.error('Failed to process your vote')
+        }
+    }, [user, accessToken, router])
 
     if (!question) return <div>Loading...</div>
 
@@ -246,33 +235,33 @@ export default function QuestionPage() {
                                 <AvatarImage src='https://github.com/shadCN.png' />
                                 <AvatarFallback className='text-xs'>JN</AvatarFallback>
                             </Avatar>
-                            <div className='bg-backgroundSecondary flex flex-col text-sm opacity-0 
+                            <div className='bg-backgroundSecondary flex flex-col text-sm opacity-0
                             group-hover:opacity-100 transition-opacity duration-300
-                            absolute left-21 top-0 bg-background p-3 
+                            absolute left-21 top-0 bg-background p-3
                             rounded-md shadow-lg z-50 w-[200px] border border-borderColor'>
                                 <h1 className='text-buttons font-medium'>{question.user.infoUser.username}</h1>
                                 <h1 className="text-textSecondary">{question.user.infoUser.email}</h1>
                                 <h1 className="text-textSecondary">{question.user.followingCount} followings</h1>
                             </div>
                         </div>
-                        <div className='flex flex-col md:flex-row'> {/* Changement ici */}
+                        <div className='flex flex-col md:flex-row'>
                             <div className='flex flex-col p-4 w-20 items-center gap-6'>
-                            <ThumbsUp onClick={() => {
-                                if (isAuthenticated) {
-                                    upvote(question)
-                                } else {
-                                    handleRequireLogin('vote', router);
-                                }
-                            }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
-                            <h1 className='text-textSecondary text-xl relative left-7'>0</h1>
-                            <ThumbsDown onClick={() => {
-                                if (isAuthenticated) {
-                                    downvote(question)
-                                } else {
-                                    handleRequireLogin('vote', router);
-                                }
-                            }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
-                            
+                                <ThumbsUp onClick={() => {
+                                    if (isAuthenticated) {
+                                        handleVote(question.id,true)
+                                    } else {
+                                        handleRequireLogin('vote', router);
+                                    }
+                                }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
+                                <h1 className='text-textSecondary text-xl relative left-7'>0</h1>
+                                <ThumbsDown onClick={() => {
+                                    if (isAuthenticated) {
+                                        handleVote(question.id,false)
+                                    } else {
+                                        handleRequireLogin('vote', router);
+                                    }
+                                }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
+
                             </div>
                             <div className='flex flex-col gap-2'>
                                 {(!user || user?.infoUser.username !== question.user.infoUser.username) &&(<HoverCard><HoverCardTrigger>
@@ -290,21 +279,21 @@ export default function QuestionPage() {
                                         className='bg-backgroundSecondary w-fit h-fit border-borderColor '> Answer the
                                         question </HoverCardContent>
                                 </HoverCard>)}
-                            <HoverCard>
-                                <HoverCardTrigger>
-                                    <MailQuestion onClick={() => {
-                                        if (isAuthenticated) {
-                                            togglefollowQuestion(question)
-                                        } else {
-                                            handleRequireLogin('follow question', router);
-                                        }
-                                    }}
+                                <HoverCard>
+                                    <HoverCardTrigger>
+                                        <MailQuestion onClick={() => {
+                                            if (isAuthenticated) {
+                                                toggleFollowQuestion(question)
+                                            } else {
+                                                handleRequireLogin('follow question', router);
+                                            }
+                                        }}
                                                       className='hover:text-buttons cursor-pointer w-6 h-6 text-textSecondary relative left-5' />
-                                </HoverCardTrigger>
-                                <HoverCardContent className='bg-backgroundSecondary w-fit h-fit border-borderColor'> follow the question </HoverCardContent>
-                            </HoverCard>
+                                    </HoverCardTrigger>
+                                    <HoverCardContent className='bg-backgroundSecondary w-fit h-fit border-borderColor'> follow the question </HoverCardContent>
+                                </HoverCard>
                             </div>
-                            
+
                         </div>
 
 
@@ -333,9 +322,9 @@ export default function QuestionPage() {
                     {question.tags.map((tag) => (
                         <Link key={tag.name} href={`/tags/${tag.name}`}>
                             <Badge className='text-textSecondary bg-backgroundPrimary text-md hover:text-backgroundSecondary hover:bg-buttons' >
-                        {tag.name}
-                      </Badge>
-                    </Link>
+                                {tag.name}
+                            </Badge>
+                        </Link>
                     ))}
                 </div>
             </div>
@@ -345,7 +334,7 @@ export default function QuestionPage() {
                     <h1>answers</h1>
                 </div>
 
-                {question.answers.map((answer, index) => (
+                {answers?.map((answer, index) => (
                     <React.Fragment key={answer.id}>
                         {index > 0 && <Separator className="bg-blue-50" />}
                         <div className='flex'>
@@ -366,9 +355,21 @@ export default function QuestionPage() {
                                 </div>
                                 <div className='flex flex-col gap-8 items-center'>
                                     <div className='flex flex-col gap-2'>
-                                        <ThumbsUp onClick={() => { }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
+                                        <ThumbsUp onClick={() => {
+                                            if (isAuthenticated) {
+                                                handleAnswerVote(answer.id,true)
+                                            } else {
+                                                handleRequireLogin('vote', router);
+                                            }
+                                        }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
                                         <h1 className='text-textSecondary text-xl relative left-7'>0</h1>
-                                        <ThumbsDown onClick={() => { }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
+                                        <ThumbsDown onClick={() => {
+                                            if (isAuthenticated) {
+                                                handleAnswerVote(answer.id,false)
+                                            } else {
+                                                handleRequireLogin('vote', router);
+                                            }
+                                        }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
 
                                     </div>
 
@@ -401,32 +402,36 @@ export default function QuestionPage() {
                 ))}
 
             </div>
-            {(!user || user?.infoUser.username !== question.user.infoUser.username) &&(< ><div  id="answer-section" className='flex h-fit mt-10 flex-col h-full min-h-[400px] bg-transparent'>
-                <h1 className='px-6 text-textPrimary text-xl pb-10'>Your answer</h1>
-                <Editor onSave={(content) => {
-                    // Maintain existing functionality
-                    setEditorContent(content);
-                }}
-                        onTextExtract={(plainText) => {
-                            setEditorPlainText(plainText);
-                        }}/>
-                <Button onClick={async () => {
-                    console.log(`Current text: ${editorPlainText}`);
-                    await answer();
-                    if (isToxic) {
-                        alert('Your content contains toxic language. Please revise before posting.');
-                        return;
-                    }
-                    // Proceed with submission
-                }} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post
-                    your answer</Button>
+            {(!user || user?.infoUser.username !== question.user.infoUser.username) &&(
+                <>
+                    <div id="answer-section" className='flex h-fit mt-10 flex-col h-full min-h-[400px] bg-transparent'>
+                        <h1 className='px-6 text-textPrimary text-xl pb-10'>Your answer</h1>
+                        <Editor onSave={(content) => {
+                            // Maintain existing functionality
+                            setEditorContent(content);
+                        }}
+                                onTextExtract={(plainText) => {
+                                    setEditorPlainText(plainText);
+                                }}/>
+                        <Button onClick={async () => {
+                            console.log(`Current text: ${editorPlainText}`);
+                            await answer();
+                            if (isToxic) {
+                                alert('Your content contains toxic language. Please revise before posting.');
+                                return;
+                            }
+                            // Proceed with submission
+                        }} className='cursor-pointer bg-buttons text-white rounded-[10px] hover:bg-buttonsHover w-fit mt-4'>Post
+                            your answer</Button>
 
-            </div>
-            {isToxic && (
-                <div className="mt-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
-                Warning: Your content contains potentially toxic language. Please review before posting.
-                </div>
-                )}</>)}
+                    </div>
+                    {isToxic && (
+                        <div className="mt-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded">
+                            Warning: Your content contains potentially toxic language. Please review before posting.
+                        </div>
+                    )}
+                </>
+            )}
         </div>
     )
 }

@@ -5,15 +5,33 @@ import { Avatar } from '@radix-ui/react-avatar'
 import React, {useEffect, useState} from 'react'
 import { useRouter } from 'next/navigation'
 import { User } from '@/types/user'
-import {Tag} from "@/types/tag";
-import {getTags} from "@/lib/api/tags_management";
 import {getUsers} from "@/lib/api/users_management";
 
+
+type SortMethod = 'followers' | 'reputation' | 'name';
 const UserList = () => {
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortMethod, setSortMethod] = useState<SortMethod>('followers');
+
+  const sortUsers = (users: User[], method: SortMethod): User[] => {
+    const sorted = [...users];
+    switch (method) {
+      case 'followers':
+        return sorted.sort((a, b) => b.followersCount - a.followersCount);
+      case 'reputation':
+        return sorted.sort((a, b) => b.reputation - a.reputation);
+      case 'name':
+        return sorted.sort((a, b) => a.infoUser.username.localeCompare(b.infoUser.username));
+      default:
+        return sorted;
+    }
+  };
+
+  const sortedUsers = sortUsers(users, sortMethod);
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -52,13 +70,27 @@ const UserList = () => {
       <div className='flex justify-between items-center'>
         <SearchInput placeholder='Filter by user name' className='w-50 border border-textSecondary rounded-full' />
         <div className=' border border-textSecondary w-50 h-8 rounded-[5px] flex items-center justify-around '>
-          <h1 className='hover:bg-buttons hover:text-white text-textSecondary text-sm p-1 rounded-[5px]'>Reputation</h1>
-          <h1 className='hover:bg-buttons hover:text-white text-textSecondary text-sm p-1 rounded-[5px]'>Voters</h1>
-          <h1 className='hover:bg-buttons hover:text-white text-textSecondary text-sm p-1 rounded-[5px]'>Editors</h1>
-        </div>
+          <h1
+              className={`hover:bg-buttons hover:text-white text-textSecondary text-sm p-1 rounded-[5px] cursor-pointer ${
+                  sortMethod === 'followers' ? 'bg-buttons text-white' : ''
+              }`}
+              onClick={() => setSortMethod('followers')}
+          >Followers</h1>
+          <h1
+              className={`hover:bg-buttons hover:text-white text-textSecondary text-sm p-1 rounded-[5px] cursor-pointer ${
+                  sortMethod === 'reputation' ? 'bg-buttons text-white' : ''
+              }`}
+              onClick={() => setSortMethod('reputation')}
+          >Reputation</h1>
+          <h1
+              className={`hover:bg-buttons hover:text-white text-textSecondary text-sm p-1 rounded-[5px] cursor-pointer ${
+                  sortMethod === 'name' ? 'bg-buttons text-white' : ''
+              }`}
+              onClick={() => setSortMethod('name')}
+          >Name</h1></div>
       </div>
       <div className='flex flex-wrap gap-2 py-4'>
-  {users.map((user, index) => (
+  {sortedUsers.map((user, index) => (
     <div 
       key={index} 
       className=' p-2 flex items-start flex-grow w-[calc(50%-8px)] 

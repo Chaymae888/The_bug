@@ -1,4 +1,3 @@
-import {Answer} from "@/types/answer";
 import {User} from "@/types/user";
 
 export interface Question {
@@ -17,8 +16,5 @@ export interface Question {
             name:string,
         }
     ],
-    answers: Answer[],
-    upvotersId:number[],
-    downvotersId:number[],
 
 }

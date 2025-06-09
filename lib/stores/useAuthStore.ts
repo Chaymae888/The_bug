@@ -8,6 +8,8 @@ import {
   exchangeToken
 } from '@/lib/api/auth';
 import { User } from '@/types/user';
+import {Question} from "@/types/question";
+import { Tag } from '@/types/tag';
 
 type AuthState = {
   accessToken: string | null;
@@ -21,6 +23,13 @@ type AuthState = {
   logout: () => void;
   hydrated: boolean;
   setUser: (user: User | null) => void;
+    followings : User[] | null;
+    setFollowings:(users: User[]|null) => void;
+    followedQuestions: Question[] | null;
+    setFollowedQuestions:(questions: Question[]|null) => void;
+    followedTags: Tag[] | null;
+    setFollowedTags: (tags:Tag[] | null)=> void;
+
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -31,10 +40,13 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       hydrated: false,
       user: null,
+            followings:null,
+            followedQuestions:null,
+            followedTags:null,
       login: async (user) => {
         try {
           const data = await login(user);
-          set({ accessToken : data.accessToken,  isAuthenticated: true, user: data.user});
+          set({ accessToken : data["access-token"],  isAuthenticated: true, user: data.user});
         } catch (err) {
           throw err;
         }
@@ -67,18 +79,14 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         set({ accessToken: null, refreshToken: null, isAuthenticated: false,user:null });
       },
-      // refreshAuthToken: async () => {
-      //   try {
-      //     const { accessToken, refreshToken: newRefreshToken } = await refreshToken();
-      //     set({ accessToken, refreshToken: newRefreshToken, isAuthenticated: true });
-      //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      //   } catch (err) {
-      //     set({ isAuthenticated: false });
-      //   }
-      // },
       setUser: (user: User | null) => set({ user }),
+            setFollowings:(users: User[]|null) => set({ followings: users }),
+            setFollowedQuestions:(questions:Question[]|null)=> set({ followedQuestions: questions }),
+            setFollowedTags:(tags:Tag[]|null)=>set({followedTags:tags})
+
     }
     ),
+
     {
       name: 'auth-storage', 
       partialize: (state) => ({ 

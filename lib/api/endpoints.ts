@@ -17,6 +17,7 @@ const API_KEYS = {
     questions:{
       ask:'api/questions',
       follow:'api/follow/questions',
+        vote:'api/votes/questions',
     },
     users:{
       get:'api/users',
@@ -25,6 +26,7 @@ const API_KEYS = {
     },
     answers:{
       add: 'api/answers',
+      vote:'api/votes/answers'
     },
     tags:{
       get: 'api/tags',
@@ -129,8 +131,16 @@ export const api = {
                     'Authorization': `Bearer ${accessToken}`,
                 }
             }),
+        getFollowings:(accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.follow}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
         upvote:(questionId:number, accessToken: string) =>
-            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}/upvote`, {
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.vote}/${questionId}/upvote`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,11 +148,25 @@ export const api = {
                 }
             }),
         downvote:(questionId:number, accessToken: string) =>
-            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}/downvote`, {
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.vote}/${questionId}/downvote`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        getVoters:(questionId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}/voters`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+        getQuestion:(questionId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
                 }
             }),
     },
@@ -169,7 +193,28 @@ export const api = {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${accessToken}`,
                 }
-            })
+            }),
+        getFollowings:(userId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.users.get}/${userId}/following`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+        getQuestions:(userId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.users.get}/${userId}/questions`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+        getAnswers:(userId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.users.get}/${userId}/answers`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
     },
     answers:{
       add:(questionId:number,content:string, accessToken: string) =>
@@ -183,7 +228,30 @@ export const api = {
                   content: content,
                   questionId: questionId,
               })
-          })
+          }),
+        getVoters:(answerId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.answers.add}/${answerId}/voters`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+        upvote:(answerId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.answers.vote}/${answerId}/upvote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        downvote:(answerId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.answers.vote}/${answerId}/downvote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
     },
     tags:{
       get:() =>
@@ -209,6 +277,28 @@ export const api = {
                     'Authorization': `Bearer ${accessToken}`,
                 }
             }),
+        getFollowings:(accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.tags.follow}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        getQuestions:(tagName:string)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.tags.get}/${tagName}/questions`,{
+                method: 'GET',
+                headers:{
+                    'Content-Type': 'application/json',
+                }
+            }),
+        getTag:(tagName:string)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.tags.get}/${tagName}`,{
+                method: 'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                }
+            })
     }
   
 } as const;
