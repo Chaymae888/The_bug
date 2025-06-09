@@ -1,22 +1,45 @@
 'use client'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import SearchInput from '@/components/search-input'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
 import {Tag} from '@/types/tag'
+import {getTags} from "@/lib/api/tags_management";
 
 
 
 const TagList = () => {
-  const tags = [
-    { name: 'javascript', count: 2523456, description: 'For questions about programming in ECMAScript (JavaScript/JS)' },
-    { name: 'python', count: 2198456, description: 'Python is a multi-paradigm, dynamically typed, multipurpose programming language' },
-    { name: 'java', count: 1917456, description: 'Java is a high-level object-oriented programming language' },
-    { name: 'c#', count: 1589456, description: 'C# is a high-level, statically typed, multi-paradigm programming language' },
-    { name: 'php', count: 1463456, description: 'PHP is a widely used, open source, general-purpose, multi-paradigm, interpreted scripting language' },
-    { name: 'html', count: 1347456, description: 'HTML (HyperText Markup Language) is the markup language for creating web pages' },
-  ]
-   const router = useRouter();
+    const router = useRouter();
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                setLoading(true);
+                const fetchedTags = await getTags();
+                setTags(fetchedTags);
+                setError(null);
+            } catch (err) {
+                console.error('Failed to fetch tags:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load tags');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTags();
+    }, []);
+
+    if (loading) {
+        return <div>Loading tags...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+
   const handleClick = (tag : Tag) => {
     sessionStorage.setItem('current-tag', JSON.stringify(tag));
   // Create URL-safe version of the name
@@ -50,11 +73,8 @@ const TagList = () => {
               <Badge className='text-textSecondary bg-backgroundPrimary'>
                 {tag.name}
               </Badge>
-              <p className='text-gray-500 text-sm mb-2 line-clamp-2 pt-2'>
-                {tag.description}
-              </p>
               <div className='text-textSecondary text-xs'>
-                {tag.count.toLocaleString()} questions
+                {tag.usageCount.toLocaleString()} questions
               </div>
             </div>
           </div>

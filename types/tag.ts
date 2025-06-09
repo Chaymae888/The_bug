@@ -1,5 +1,11 @@
+import {User} from "@/types/user";
+import {Question} from "@/types/question";
+
 export  interface Tag {
+  id: number;
   name: string
-  count: number
-  description: string
+  usageCount: number
+  followersCount: number
+  followers:User[]
+  questions:Question[]
 }

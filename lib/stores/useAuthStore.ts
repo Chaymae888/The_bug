@@ -20,7 +20,7 @@ type AuthState = {
   exchangeToken: (token:string) => Promise<void>;
   logout: () => void;
   hydrated: boolean;
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
       //     set({ isAuthenticated: false });
       //   }
       // },
-      setUser: (user: User) => set({ user }),
+      setUser: (user: User | null) => set({ user }),
     }
     ),
     {

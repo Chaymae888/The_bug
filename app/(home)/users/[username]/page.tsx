@@ -15,176 +15,12 @@ export default function UserPage() {
     const [isFollowing, setIsFollowing] = useState(false)
     const params = useParams();
 
-    const questions = [
-    {
-      id: 1,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Doe',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 1000,
-      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
-      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 2,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Sina',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 900,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 3,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Whick',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 500,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    }
-  ]
-   const answers = [
-    {
-      id: 1,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Doe',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 1000,
-      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
-      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 2,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Sina',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 900,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 3,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Whick',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 500,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    }
-  ]
-   const tags = [
-    {
-      id: 1,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Doe',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 1000,
-      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
-      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 2,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Sina',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 900,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 3,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Whick',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 500,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    }
-  ]
-   const reputation = [
-    {
-      id: 1,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Doe',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 1000,
-      title: "How to use 0 More specifically, I am talking about Kubernetes pods, running different instances of the same application. I haven't found official recommendations for that scenario. Besides attaching a Persistent Volume, it feels like I need to also care about the race conditions.?",
-      body: "Explication du probleme : Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown ....",
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 2,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Sina',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 900,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    },
-    {
-      id: 3,
-      userImage: 'https://github.com/shadCN.png',
-      username: 'John Whick',
-      userJob: 'Software Engineer',
-      userContributionsNumber: 500,
-      title: 'How to use React?',
-      body: 'I am trying to learn React, but I am having trouble understanding how to use it. Can someone help me?',
-      numberofresponses: 5,
-      numberofupvotes: 10,
-      numberofdownvotes: 2,
-      tags: ['react', 'javascript'],
-    }
-  ]
 
   const activityData = {
-        questions: questions,
-        answers: answers,
-        tags: tags,
-        reputation: reputation
+        questions: user?.questions,
+        answers: user?.answers,
+        tags: user?.tags,
+        reputation: user?.reputation
     }
 
     // Get the current data based on selected activity
@@ -234,8 +70,6 @@ export default function UserPage() {
                     })
                 }
 
-                // const data = await response.json()
-                // setUser(data)
             } catch (err) {
                 console.error('Error fetching user data:', err)
                 setUser(null) // Set user to null if there's an error
@@ -246,18 +80,18 @@ export default function UserPage() {
     }, [params?.username])
     return (
         <div className='flex flex-col p-4'>
-            {/* Profile Header */}
+
             {user && (
                 <div className='flex flex-col md:flex-row justify-between gap-4'>
                     <div className='flex flex-col sm:flex-row items-center gap-4'>
                         <Avatar className="cursor-pointer rounded-[10px] w-[20vh] h-[20vh] sm:w-[25vh] sm:h-[25vh]">
-                            <AvatarImage src={user.image || 'https://github.com/shadCN.png'} />
+                            <AvatarImage src={user.photoUrl || 'https://github.com/shadCN.png'} />
                             <AvatarFallback>
-                                {user.username.substring(0, 2).toUpperCase()}
+                                {user.infoUser.username.substring(0, 2).toUpperCase()}
                             </AvatarFallback>
                         </Avatar>
                         <div className='flex flex-col gap-2 text-center sm:text-left'>
-                            <h1 className='text-2xl sm:text-4xl text-textPrimary'>{user.username}</h1>
+                            <h1 className='text-2xl sm:text-4xl text-textPrimary'>{user.infoUser.username}</h1>
                             <div className='flex flex-col sm:flex-row gap-3 text-[#B1B1B1] justify-center sm:justify-start'>
                                 <div className='flex items-center justify-center gap-1'>
                                     <Cake size={16} />
@@ -306,11 +140,11 @@ export default function UserPage() {
                             <div className='flex bg-backgroundSecondary border border-borderColor rounded-[10px] p-2 gap-4 justify-around sm:justify-start'>
                                 <div className='flex flex-col gap-3'>
                                     <div className='flex flex-col gap-1'>
-                                        <h1>0</h1>
+                                        <h1>{user?.reputation}</h1>
                                         <h1 className='text-[#B1B1B1]'>reputation</h1>
                                     </div>
                                     <div className='flex flex-col gap-1'>
-                                        <h1>0</h1>
+                                        <h1>{user?.answerCount}</h1>
                                         <h1 className='text-[#B1B1B1]'>answers</h1>
                                     </div>
                                 </div>
@@ -320,7 +154,7 @@ export default function UserPage() {
                                         <h1 className='text-[#B1B1B1]'>reached</h1>
                                     </div>
                                     <div className='flex flex-col gap-1'>
-                                        <h1>0</h1>
+                                        <h1>{user?.questionCount}</h1>
                                         <h1 className='text-[#B1B1B1]'>questions</h1>
                                     </div>
                                 </div>

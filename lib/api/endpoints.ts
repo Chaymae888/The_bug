@@ -15,7 +15,20 @@ const API_KEYS = {
   },
     predictToxicity : 'predict',
     questions:{
-      ask:'api/questions'
+      ask:'api/questions',
+      follow:'api/follow/questions',
+    },
+    users:{
+      get:'api/users',
+      follow:'api/users/follow',
+      unfollow:'api/users/unfollow'
+    },
+    answers:{
+      add: 'api/answers',
+    },
+    tags:{
+      get: 'api/tags',
+      follow:'api/follow/tags',
     }
 } as const;
 
@@ -80,14 +93,122 @@ export const api = {
             body: JSON.stringify({ text }),
         }),
     questions: {
-      ask :(question:QuestionInfo,accessToken:string)=>
-          fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}`,{
+        ask: (question: QuestionInfo, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    title: question.title,
+                    content: question.content,
+                    tagNames: question.tagNames,
+                })
+            }),
+        get:()=>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+        follow:(questionId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.follow}/${questionId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        unfollow:(questionId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.follow}/${questionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        upvote:(questionId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}/upvote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        downvote:(questionId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}/downvote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+    },
+    users:{
+        get:()=>
+            fetch(`${BACKEND_URL}/${API_KEYS.users.get}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }),
+      follow:(userId:number, accessToken: string) =>
+          fetch(`${BACKEND_URL}/${API_KEYS.users.follow}/${userId}`, {
               method: 'POST',
-              headers:{
-                  'Authorization': accessToken,
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${accessToken}`,
+              }
+          }),
+        unfollow:(userId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.users.unfollow}/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+    },
+    answers:{
+      add:(questionId:number,content:string, accessToken: string) =>
+          fetch(`${BACKEND_URL}/${API_KEYS.answers.add}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${accessToken}`,
               },
-              body:JSON.stringify(question)
+              body: JSON.stringify({
+                  content: content,
+                  questionId: questionId,
+              })
           })
+    },
+    tags:{
+      get:() =>
+          fetch(`${BACKEND_URL}/${API_KEYS.tags.get}`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+              }
+          }),
+      follow:(tagId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.tags.follow}/${tagId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+      unfollow:(tagId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.tags.follow}/${tagId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
     }
   
 } as const;

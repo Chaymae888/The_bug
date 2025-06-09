@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import {SelectTags} from '@/components/SelectTags'
 import { useRouter } from 'next/navigation'
-import { nanoid } from 'nanoid'
 import {useAuthStore} from "@/lib/stores/useAuthStore";
 import {addQuestion} from "@/lib/api/questions_management";
 
@@ -16,22 +15,36 @@ export default function Ask() {
   const [editorContent, setEditorContent] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const {accessToken} = useAuthStore()
-  
-  const handleSubmit = async () => {
-    const formData = {
-      title,
-      content: editorContent,
-      tagNames: selectedTags,
-    };
-      try{
-          const question = await addQuestion(formData, accessToken);
-          sessionStorage.setItem(`question-${question.id}`, JSON.stringify(question))
-          router.push(`/questions/${question.id}`);
-      }catch (error) {
-          console.error('Failed to submit question:', error);
-      }
 
-  }
+    const handleSubmit = async () => {
+        const formData = {
+            title,
+            content: editorContent,
+            tagNames: selectedTags,
+        };
+
+        try {
+            if (!accessToken) {
+                console.log("Access Token not set");
+                return;
+            }
+
+
+            if (!formData.title?.trim() || !formData.content?.trim()) {
+                console.error("Title and content are required");
+                return;
+            }
+            console.log(`this is the access token:${accessToken}`);
+            console.log("Submitting question:", formData); // Debug log
+
+            const question = await addQuestion(formData, accessToken);
+            sessionStorage.setItem(`question-${question.id}`, JSON.stringify(question));
+            router.push(`/questions/${question.id}`);
+        } catch (error) {
+            console.error('Failed to submit question:', error);
+            // Show user-friendly error message
+        }
+    }
   return (
     <div className='p-4 flex flex-col'>
         <h1 className='text-[50px] text-textPrimary'>Ask a public question</h1>

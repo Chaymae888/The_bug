@@ -2,137 +2,46 @@
 import SearchInput from '@/components/search-input'
 import { AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Avatar } from '@radix-ui/react-avatar'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { useRouter } from 'next/navigation'
 import { User } from '@/types/user'
+import {Tag} from "@/types/tag";
+import {getTags} from "@/lib/api/tags_management";
+import {getUsers} from "@/lib/api/users_management";
 
 const UserList = () => {
   const router = useRouter()
-  const users: User[] = [
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'John Doe',
-      job: 'Software Engineer',
-      country: 'USA',
-      numberoffollowers: 1000,
-      goodAt: ['javascript', 'python', 'java'],
-      numberofVotes: 100,
-      numberofEdits: 50,
-      memberfor: '2 years',
-      lastseen: '1 hour ago',
-      reputation: 1500,
-      about: 'Passionate developer.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'Jane Smith',
-      job: 'Frontend Developer',
-      country: 'Canada',
-      numberoffollowers: 800,
-      goodAt: ['typescript', 'react', 'css'],
-      numberofVotes: 80,
-      numberofEdits: 40,
-      memberfor: '1 year',
-      lastseen: '2 hours ago',
-      reputation: 1200,
-      about: 'UI/UX enthusiast.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'Alice Johnson',
-      job: 'Backend Developer',
-      country: 'UK',
-      numberoffollowers: 600,
-      goodAt: ['nodejs', 'express', 'mongodb'],
-      numberofVotes: 60,
-      numberofEdits: 30,
-      memberfor: '3 years',
-      lastseen: '3 hours ago',
-      reputation: 1100,
-      about: 'API specialist.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'Bob Lee',
-      job: 'Full Stack Developer',
-      country: 'Australia',
-      numberoffollowers: 900,
-      goodAt: ['python', 'django', 'react'],
-      numberofVotes: 90,
-      numberofEdits: 45,
-      memberfor: '4 years',
-      lastseen: '4 hours ago',
-      reputation: 1400,
-      about: 'Loves building products.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'Charlie Brown',
-      job: 'DevOps Engineer',
-      country: 'Germany',
-      numberoffollowers: 700,
-      goodAt: ['aws', 'docker', 'kubernetes'],
-      numberofVotes: 70,
-      numberofEdits: 35,
-      memberfor: '2 years',
-      lastseen: '5 hours ago',
-      reputation: 1300,
-      about: 'Cloud and automation.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'Diana Prince',
-      job: 'QA Engineer',
-      country: 'France',
-      numberoffollowers: 500,
-      goodAt: ['testing', 'cypress', 'jest'],
-      numberofVotes: 50,
-      numberofEdits: 25,
-      memberfor: '1 year',
-      lastseen: '6 hours ago',
-      reputation: 1000,
-      about: 'Quality matters.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-    {
-      image: 'https://github.com/shadCN.png',
-      username: 'Eve Adams',
-      job: 'Data Scientist',
-      country: 'India',
-      numberoffollowers: 400,
-      goodAt: ['python', 'pandas', 'machine learning'],
-      numberofVotes: 40,
-      numberofEdits: 20,
-      memberfor: '1 year',
-      lastseen: '6 hours ago',
-      reputation: 1000,
-      about: 'Quality matters.',
-      links: [],
-      answers: 0,
-      questions: 0
-    },
-  ]
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const fetchedUsers = await getUsers();
+        setUsers(fetchedUsers);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load users');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+  if (loading) {
+    return <div>Loading users...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
     const handleClick = (user: User) => {
     sessionStorage.setItem('current-user', JSON.stringify(user));
-    const urlSafeName = user.username.toLowerCase()
+    const urlSafeName = user.infoUser.username.toLowerCase()
       .replace(/\s+/g, '-')       
       .replace(/[^a-z0-9-]/g, '');
     router.push(`/users/${urlSafeName}`);
@@ -161,23 +70,16 @@ const UserList = () => {
         hover:before:w-full hover:before:h-full '
     >
       <Avatar onClick={() => handleClick(user)} className='z-100 w-12 h-13 mt-1 transition-all duration-300 hover:w-16 hover:h-17 hover:-translate-y-1'>
-          <AvatarImage className='rounded-[4px]' src={user.image} />
+          <AvatarImage className='rounded-[4px]' src={user.photoUrl} />
           <AvatarFallback className='text-xs'>JN</AvatarFallback>
         </Avatar>
       <div className='flex flex-col ml-2 text-sm'>
-        <h1 className='text-buttons font-medium'>{user.username}</h1>
+        <h1 className='text-buttons font-medium'>{user.infoUser.username}</h1>
         <h1 className="text-textSecondary">{user.country}</h1>
         <h1 className="text-textSecondary">
-          {user.numberoffollowers?.toLocaleString() ?? '0'} followers
+          {user.followersCount?.toLocaleString() ?? '0'} followers
         </h1>
-        <div className="text-buttons text-xs">
-          {user.goodAt.map((tag, i) => (
-            <span key={tag}>
-              {tag}
-              {i !== user.goodAt.length - 1 && ', '}
-            </span>
-          ))}
-        </div>
+
       </div>
     </div>
   ))}
