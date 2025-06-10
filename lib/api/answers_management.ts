@@ -83,3 +83,34 @@ export const downvoteAnswer = async (
         throw error;
     }
 };
+
+export const acceptAnswer= async (answerId:number,accessToken:string):Promise<Answer>=>{
+    try {
+        const res = await api.answers.accept(answerId, accessToken);
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+
+
+            console.error('Server error details:', errorData);
+            throw new Error(errorData.message || 'accept answer failed');
+        }
+
+        return await res.json();
+
+    } catch (error) {
+        if (error instanceof Error ) {
+            console.error(error.message);
+        }
+        throw error;
+    }
+}
+export const getAnswer= async (answerId:number):Promise<Answer>=>{
+    const res = await api.answers.getAnswer(answerId);
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Server error details:', errorData);
+        throw new Error(errorData.message || 'get answer failed');
+    }
+    return await res.json();
+}

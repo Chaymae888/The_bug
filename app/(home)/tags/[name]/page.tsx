@@ -59,7 +59,8 @@ export default function TagPage() {
           throw new Error('Tag name not specified in URL');
         }
 
-        const fetchedTag:Tag = await getTag(params.name);
+        const tagName = Array.isArray(params.name) ? params.name[0] : params.name;
+        const fetchedTag: Tag = await getTag(tagName);
 
         setTag(fetchedTag);
       } catch (err) {

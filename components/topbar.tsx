@@ -31,7 +31,7 @@ const Topbar = () => {
         {isAuthenticated ? (<div className='flex items-center justify-center gap-2 '>
           <Link
             id="open_msg_box"
-            className="hasnotifications nav-link relative" href={''}          >
+            className="hasnotifications nav-link relative" href="/notifications">
             <NoteIcon className="w-6 h-6" opacityColor='#B1B1B1' color='#38A3A5' />
             <span className="pulse right-[13px]" />{" "}
           </Link>

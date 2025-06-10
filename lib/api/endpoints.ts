@@ -31,7 +31,11 @@ const API_KEYS = {
     tags:{
       get: 'api/tags',
       follow:'api/follow/tags',
+    },
+    notifications:{
+      get: 'api/notifications'
     }
+
 } as const;
 
 
@@ -169,6 +173,14 @@ export const api = {
                     'Content-Type': 'application/json',
                 }
             }),
+
+        getAnswers:(questionId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.questions.ask}/${questionId}/answers`,{
+                method:'GET',
+                headers: {
+                    'content-Type': 'application/json',
+                } }),
+
     },
     users:{
         get:()=>
@@ -252,6 +264,21 @@ export const api = {
                     'Authorization': `Bearer ${accessToken}`,
                 }
             }),
+        accept:(answerId:number, accessToken: string) =>
+            fetch(`${BACKEND_URL}/${API_KEYS.answers.add}/${answerId}/accept`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            }),
+        getAnswer:(answerId:number)=>
+            fetch(`${BACKEND_URL}/${API_KEYS.answers.add}/${answerId}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
     },
     tags:{
       get:() =>
@@ -299,6 +326,16 @@ export const api = {
                     'Content-Type':'application/json',
                 }
             })
+    },
+    notifications:{
+      get:(accessToken:string)=>
+          fetch(`${BACKEND_URL}/${API_KEYS.notifications.get}`,{
+              method:'GET',
+              headers:{
+                  'Content-Type':'application/json',
+                  'Authorization': `Bearer ${accessToken}`,
+              }
+          })
     }
   
 } as const;

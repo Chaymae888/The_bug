@@ -24,8 +24,8 @@ import { usePathname } from "next/navigation";
 import React, {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {useAuthStore} from "@/lib/stores/useAuthStore";
+import {useRouter} from "next/navigation"
 
-// Menu items.
 const items = [
   {
     title: "Home",
@@ -49,18 +49,17 @@ const items = [
 export function AppSidebar() {
   const pathname = usePathname();
   const [showLogoutDialog,setShowLogoutDialog]=useState(false);
-  const {isAuthenticated ,hydrated}=useAuthStore();
+  const {isAuthenticated ,hydrated ,logout}=useAuthStore();
+  const router = useRouter();
 
   if (!hydrated) {
     return null; // Or a loading skeleton
   }
 
   const handleLogout = () => {
-    // Add your logout logic here
+    logout();
     console.log("User logged out");
-    // Typically you would:
-    // 1. Clear auth tokens
-    // 2. Redirect to login page
+    router.push('/home')
   };
   return (
       <>

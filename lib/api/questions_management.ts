@@ -179,3 +179,12 @@ export const getQuestion=async (questionId:number):Promise<Question>=>{
     }
     return await res.json();
 }
+export const getAnswers=async (questionId:number):Promise<Answer[]>=>{
+    const res = await api.questions.getAnswers(questionId);
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Server error details:', errorData);
+        throw new Error(errorData.message || 'get  answer list  failed');
+    }
+    return await res.json();
+}

@@ -16,6 +16,7 @@ import { ImageNode } from '@/components/editor/nodes/ImageNode'
 import Theme from '@/components/editor/Theme'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { BadgeCheck } from 'lucide-react';
 import { Edit, MailQuestion, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Editor } from '@/components/editor/Editor'
@@ -26,10 +27,10 @@ import {Question} from "@/types/question";
 import {useAuthStore} from "@/lib/stores/useAuthStore";
 import {Separator} from "@/components/ui/separator";
 import {timeAgo} from "@/lib/utils/timeAgo";
-import {addAnswer, getAnswerVoters, upvoteAnswer, downvoteAnswer} from "@/lib/api/answers_management";
+import {addAnswer, getAnswerVoters, upvoteAnswer, downvoteAnswer, acceptAnswer} from "@/lib/api/answers_management";
 import {
     downvoteQuestion,
-    followQuestion, getVoters,
+    followQuestion, getAnswers, getVoters,
     unfollowQuestion,
     upvoteQuestion
 } from "@/lib/api/questions_management";
@@ -55,7 +56,7 @@ const initialConfig = {
     theme: Theme
 };
 
-const answers:Answer[] = [];
+
 
 export default function QuestionPage() {
     const router = useRouter();
@@ -63,6 +64,7 @@ export default function QuestionPage() {
     const params = useParams()
     const [question, setQuestion] = useState<Question | null>(null)
     const [editorContent, setEditorContent] = useState('')
+    const[questionAnswers,setQuestionAnswers]=useState<Answer[]>([])
 
     const [isToxic, setIsToxic] = useState(false);
 
@@ -89,6 +91,21 @@ export default function QuestionPage() {
 
         loadQuestion()
     }, [params.id])
+
+    useEffect(() => {
+        const fetchAnswers = async () => {
+            if (!question) return;
+
+            try {
+                const fetchedAnswers = await getAnswers(question.id);
+                setQuestionAnswers(fetchedAnswers);
+            } catch (err) {
+                console.error('Failed to fetch data:', err);
+            }
+        };
+
+        fetchAnswers();
+    }, [question, user?.userId, accessToken, isAuthenticated]);
 
     const checkContentToxicity = async () => {
         if (!editorPlainText.trim()) return;
@@ -172,8 +189,17 @@ export default function QuestionPage() {
 
             if (isUpvote) {
                 await upvoteQuestion(questionId, accessToken);
+                setQuestion(prev => prev ? {
+                    ...prev,
+                    voteScore: prev.voteScore + 1
+                } : null);
             } else {
                 await downvoteQuestion(questionId, accessToken);
+                await downvoteQuestion(questionId, accessToken);
+                setQuestion(prev => prev ? {
+                    ...prev,
+                    downvotes: prev.voteScore - 1
+                } : null);
             }
 
             // Optionally refresh question data
@@ -200,8 +226,22 @@ export default function QuestionPage() {
 
             if (isUpvote) {
                 await upvoteAnswer(answerId, accessToken);
+                setQuestionAnswers(prev =>
+                    prev.map(answer =>
+                        answer.id === answerId
+                            ? { ...answer, voteScore: answer.voteScore + 1 }
+                            : answer
+                    )
+                );
             } else {
                 await downvoteAnswer(answerId, accessToken);
+                setQuestionAnswers(prev =>
+                    prev.map(answer =>
+                        answer.id === answerId
+                            ? { ...answer, voteScore: answer.voteScore - 1 }
+                            : answer
+                    )
+                );
             }
 
             // Optionally refresh question data
@@ -210,7 +250,25 @@ export default function QuestionPage() {
             toast.error('Failed to process your vote')
         }
     }, [user, accessToken, router])
+     const handleAcceptAnswer = useCallback(async(answerId:number)=>{
+         if (!user || !accessToken) {
+             handleRequireLogin('vote', router)
+             return
+         }
+         try {
+             await acceptAnswer(answerId,accessToken);
+             setQuestionAnswers(prevAnswers =>
+                 prevAnswers.map(answer => ({
+                     ...answer,
+                     isAccepted: answer.id === answerId
+                 }))
+             );
+         } catch (error) {
+             console.error('Failed to vote:', error)
+             toast.error('Failed to process your vote')
+         }
 
+     }, [user, accessToken, router])
     if (!question) return <div>Loading...</div>
 
     return (
@@ -253,7 +311,7 @@ export default function QuestionPage() {
                                         handleRequireLogin('vote', router);
                                     }
                                 }} className='hover:text-buttons text-3xl cursor-pointer text-icons-primary w-8 h-8 relative left-5' />
-                                <h1 className='text-textSecondary text-xl relative left-7'>0</h1>
+                                <h1 className='text-textSecondary text-xl relative left-7'>{question.voteScore}</h1>
                                 <ThumbsDown onClick={() => {
                                     if (isAuthenticated) {
                                         handleVote(question.id,false)
@@ -330,11 +388,11 @@ export default function QuestionPage() {
             </div>
             <div className='flex py-2 h-fit mt-10 flex-col bg-backgroundSecondary border border-borderColor rounded-[5px]'>
                 <div className='flex px-6 mb-5 gap-2 text-textSecondary'>
-                    <h1 >0</h1>
+                    <h1 >{question.answerCount}</h1>
                     <h1>answers</h1>
                 </div>
 
-                {answers?.map((answer, index) => (
+                {questionAnswers?.map((answer, index) => (
                     <React.Fragment key={answer.id}>
                         {index > 0 && <Separator className="bg-blue-50" />}
                         <div className='flex'>
@@ -348,13 +406,16 @@ export default function QuestionPage() {
                             group-hover:opacity-100 transition-opacity duration-300
                             absolute left-21 top-0 bg-background p-3
                             rounded-md shadow-lg z-50 w-[200px] border border-borderColor'>
-                                        <h1 className='text-buttons font-medium'>answer.authorUsername</h1>
+                                        <h1 className='text-buttons font-medium'>answer.username</h1>
                                         <h1 className="text-textSecondary">answer.authorEmail</h1>
                                         <h1 className="text-textSecondary">5000 followers</h1>
                                     </div>
                                 </div>
                                 <div className='flex flex-col gap-8 items-center'>
-                                    <div className='flex flex-col gap-2'>
+                                    <div className='flex flex-col justify-center items-center gap-2'>
+                                        {answer.isAccepted && (
+                                            <BadgeCheck className=' text-7xl cursor-pointer text-green-500 w-12 h-12 pb-2 relative left-5'/>
+                                        )}
                                         <ThumbsUp onClick={() => {
                                             if (isAuthenticated) {
                                                 handleAnswerVote(answer.id,true)
@@ -377,29 +438,48 @@ export default function QuestionPage() {
 
 
                             </div>
-                            <div className="flex-1 overflow-auto">
-                                <LexicalComposer initialConfig={{
-                                    ...initialConfig,
-                                    editorState: answer.content
-                                }}>
-                                    <div className="editor-container">
-                                        <RichTextPlugin
-                                            contentEditable={
-                                                <ContentEditable className="editor-input p-0 m-0 min-h-[300px]" />
-                                            }
-                                            placeholder={null}
-                                            ErrorBoundary={LexicalErrorBoundary}
-                                        />
-                                        <HistoryPlugin />
-                                        <ListPlugin />
-                                        <LinkPlugin />
-                                    </div>
-                                </LexicalComposer>
-                            </div>
-                        </div>
 
+
+                                <div className="flex-1 overflow-auto">
+
+                                    <LexicalComposer initialConfig={{
+                                        ...initialConfig,
+                                        editorState: answer.content
+                                    }}>
+                                        <div className="editor-container">
+                                            <RichTextPlugin
+                                                contentEditable={
+                                                    <ContentEditable className="editor-input p-0 m-0 min-h-[300px]" />
+                                                }
+                                                placeholder={null}
+                                                ErrorBoundary={LexicalErrorBoundary}
+                                            />
+                                            <HistoryPlugin />
+                                            <ListPlugin />
+                                            <LinkPlugin />
+                                        </div>
+                                    </LexicalComposer>
+                                </div>
+
+
+                        </div>
+                        {user?.infoUser.username === question.user.infoUser.username && (
+                            <button
+                                onClick={answer.isAccepted?()=>{toast.message('the answer is already accepted')}:() => handleAcceptAnswer(answer.id)}
+                                className={` top-2 right-2 w-fit cursor-pointer z-10 px-3 py-1 m-6 rounded-md text-sm 
+                                ${answer.isAccepted
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-buttons hover:bg-buttonsHover text-white'
+                                }`}
+                            >
+                                {answer.isAccepted ? 'Accepted' : 'Accept Answer'}
+                            </button>
+                        )}
                     </React.Fragment>
+
                 ))}
+
+
 
             </div>
             {(!user || user?.infoUser.username !== question.user.infoUser.username) &&(
